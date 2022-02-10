@@ -26,13 +26,19 @@
 		<encoder>
 			<pattern>${log.pattern}</pattern>
 		</encoder>
-		<filter class="ch.qos.logback.classic.filter.LevelFilter">
-            <!-- 过滤的级别 -->
-            <level>DEBUG</level>
-            <!-- 匹配时的操作：接收（记录） -->
-            <onMatch>ACCEPT</onMatch>
-            <!-- 不匹配时的操作：拒绝（不记录） -->
-            <onMismatch>DENY</onMismatch>
+<!--		<filter class="ch.qos.logback.classic.filter.LevelFilter">-->
+<!--            &lt;!&ndash; 过滤的级别 &ndash;&gt;-->
+<!--            <level>INFO</level>-->
+<!--            &lt;!&ndash; 匹配时的操作：接收（记录） &ndash;&gt;-->
+<!--            <onMatch>ACCEPT</onMatch>-->
+<!--            &lt;!&ndash; 不匹配时的操作：拒绝（不记录） &ndash;&gt;-->
+<!--            <onMismatch>DENY</onMismatch>-->
+<!--        </filter>-->
+
+        <!-- 阀值过滤器，指定一个日志级别，大于或等于当前级别的日志会被接受，低于当前级别的日志不会被接受-->
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <!--指定日志级别阀值为debug，则低于debug的trace不会被记录，等于或高于debug级别的都会被记录-->
+            <level>debug</level>
         </filter>
 	</appender>
 	
