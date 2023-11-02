@@ -36,8 +36,9 @@ server:
 # 日志配置
 logging:
   level:
-    com.ruoyi: info
-    org.springframework: info
+    com: debug
+    org.springframework: debug
+    io: trace
 
 # Spring配置
 spring:
@@ -46,7 +47,7 @@ spring:
     # 国际化资源文件路径
     basename: i18n/messages
   profiles: 
-    active: prod
+    active: dev
   # 文件上传
   servlet:
      multipart:
@@ -60,29 +61,29 @@ spring:
       # 热部署开关
       enabled: true
   # redis 配置
-  redis:
-#    # 地址
-#    host: 106.53.141.25
-#    # 端口，默认为6379
-#    port: 7100
-#    cluster:
-#      nodes: 106.53.141.25:7100, 106.53.141.25:7101, 106.53.141.25:7200, 106.53.141.25:7201
-    # 数据库索引
-    database: 0
-    # 密码
-    password: jgc123
-    # 连接超时时间
-    timeout: 10s
-    lettuce:
-      pool:
-        # 连接池中的最小空闲连接
-        min-idle: 0
-        # 连接池中的最大空闲连接
-        max-idle: 8
-        # 连接池的最大数据库连接数
-        max-active: 8
-        # #连接池最大阻塞等待时间（使用负值表示没有限制）
-        max-wait: -1ms
+#  redis:
+##    # 地址
+##    host: 106.53.141.25
+##    # 端口，默认为6379
+##    port: 7100
+##    cluster:
+##      nodes: 106.53.141.25:7100, 106.53.141.25:7101, 106.53.141.25:7200, 106.53.141.25:7201
+#    # 数据库索引
+#    database: 0
+#    # 密码
+#    password: jgc123
+#    # 连接超时时间
+#    timeout: 10s
+#    lettuce:
+#      pool:
+#        # 连接池中的最小空闲连接
+#        min-idle: 0
+#        # 连接池中的最大空闲连接
+#        max-idle: 8
+#        # 连接池的最大数据库连接数
+#        max-active: 8
+#        # #连接池最大阻塞等待时间（使用负值表示没有限制）
+#        max-wait: -1ms
 
 # token配置
 token:
@@ -132,21 +133,25 @@ spring:
       on-profile: dev
 
   redis:
-    host: localhost
+#    host: localhost
+#    port: 6379
+#    database: 0
+#    # 密码
+#    password:
+    database: 11
+    host: 192.168.0.101
     port: 6379
-    database: 0
-    # 密码
-    password:
+    password: hnbd@2017
     # 连接超时时间
-    timeout: 10s
+    timeout: 1000000s
     lettuce:
       pool:
         # 连接池中的最小空闲连接
         min-idle: 0
         # 连接池中的最大空闲连接
-        max-idle: 8
+        max-idle: 2
         # 连接池的最大数据库连接数
-        max-active: 8
+        max-active: 2
         # #连接池最大阻塞等待时间（使用负值表示没有限制）
         max-wait: -1ms
 

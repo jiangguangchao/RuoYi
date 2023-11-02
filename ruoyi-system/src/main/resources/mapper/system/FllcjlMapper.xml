@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.jgc.mapper.FllcjlMapper">
+    
+    <resultMap type="Fllcjl" id="FllcjlResult">
+        <result property="flid"    column="flid"    />
+        <result property="lcjdmc"    column="lcjdmc"    />
+        <result property="lcjdxh"    column="lcjdxh"    />
+        <result property="czr"    column="czr"    />
+        <result property="czsj"    column="czsj"    />
+    </resultMap>
+
+    <sql id="selectFllcjlVo">
+        select flid, lcjdmc, lcjdxh, czr, czsj from fllcjl
+    </sql>
+
+    <select id="selectFllcjlList" parameterType="Fllcjl" resultMap="FllcjlResult">
+        <include refid="selectFllcjlVo"/>
+        <where>  
+            <if test="flid != null  and flid != ''"> and flid = #{flid}</if>
+        </where>
+    </select>
+    
+    <select id="selectFllcjlByFlid" parameterType="String" resultMap="FllcjlResult">
+        <include refid="selectFllcjlVo"/>
+        where flid = #{flid}
+    </select>
+        
+    <insert id="insertFllcjl" parameterType="Fllcjl">
+        insert into fllcjl
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="flid != null">flid,</if>
+            <if test="lcjdmc != null and lcjdmc != ''">lcjdmc,</if>
+            <if test="lcjdxh != null">lcjdxh,</if>
+            <if test="czr != null">czr,</if>
+            <if test="czsj != null">czsj,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="flid != null">#{flid},</if>
+            <if test="lcjdmc != null and lcjdmc != ''">#{lcjdmc},</if>
+            <if test="lcjdxh != null">#{lcjdxh},</if>
+            <if test="czr != null">#{czr},</if>
+            <if test="czsj != null">#{czsj},</if>
+         </trim>
+    </insert>
+
+    <update id="updateFllcjl" parameterType="Fllcjl">
+        update fllcjl
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="lcjdmc != null and lcjdmc != ''">lcjdmc = #{lcjdmc},</if>
+            <if test="lcjdxh != null">lcjdxh = #{lcjdxh},</if>
+            <if test="czr != null">czr = #{czr},</if>
+            <if test="czsj != null">czsj = #{czsj},</if>
+        </trim>
+        where flid = #{flid}
+    </update>
+
+    <delete id="deleteFllcjlByFlid" parameterType="String">
+        delete from fllcjl where flid = #{flid}
+    </delete>
+
+    <delete id="deleteFllcjlByFlids" parameterType="String">
+        delete from fllcjl where flid in 
+        <foreach item="flid" collection="array" open="(" separator="," close=")">
+            #{flid}
+        </foreach>
+    </delete>
+</mapper>

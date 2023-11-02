@@ -1,6 +1,8 @@
 package com.ruoyi.system.service.impl;
 
 import java.util.List;
+
+import com.ruoyi.common.core.domain.entity.SysUserPostVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.ruoyi.common.constant.UserConstants;
@@ -70,6 +72,11 @@ public class SysPostServiceImpl implements ISysPostService
     public List<Long> selectPostListByUserId(Long userId)
     {
         return postMapper.selectPostListByUserId(userId);
+    }
+
+    @Override
+    public List<SysUserPostVo> selectUserByPost(String postCode) {
+        return postMapper.selectUserByPost(postCode);
     }
 
     /**

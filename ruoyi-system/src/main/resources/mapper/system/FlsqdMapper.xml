@@ -1,0 +1,218 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.jgc.mapper.FlsqdMapper">
+
+    <resultMap type="Flsqd" id="FlsqdResult">
+        <result property="id"    column="id"    />
+        <result property="hzXm"    column="hz_xm"    />
+        <result property="hzXb"    column="hz_xb"    />
+        <result property="hzSr"    column="hz_sr"    />
+        <result property="hzDh"    column="hz_dh"    />
+        <result property="hzZyh"    column="hz_zyh"    />
+        <result property="hzKs"    column="hz_ks"    />
+        <result property="hzBfys"    column="hz_bfys"    />
+        <result property="hzFlys"    column="hz_flys"    />
+        <result property="hzTbhl"    column="hz_tbhl"    />
+        <result property="hzBs"    column="hz_bs"    />
+        <result property="gdfs"    column="gdfs"    />
+        <result property="smsj"    column="smsj"    />
+        <result property="smzx"    column="smzx"    />
+        <result property="smxj"    column="smxj"    />
+        <result property="ch"    column="ch"    />
+        <result property="smlx1"    column="smlx1"    />
+        <result property="smlx2"    column="smlx2"    />
+        <result property="kf"    column="kf"    />
+        <result property="hes"    column="hes"    />
+        <result property="bn"    column="bn"    />
+        <result property="qsbj"    column="qsbj"    />
+        <result property="bolus"    column="bolus"    />
+        <result property="khp"    column="khp"    />
+        <result property="qit"    column="qit"    />
+        <result property="txrhlx"    column="txrhlx"    />
+        <result property="txrhbh"    column="txrhbh"    />
+        <result property="cdw"    column="cdw"    />
+        <result property="zljs"    column="zljs"    />
+        <result property="zljq"    column="zljq"    />
+        <result property="igrt"    column="igrt"    />
+        <result property="igrtpllx"    column="igrtpllx"    />
+        <result property="igrtplz"    column="igrtplz"    />
+        <result property="hxmk"    column="hxmk"    />
+        <result property="jlyz"    column="jlyz"    />
+        <result property="dqlcjdmc"    column="dqlcjdmc"    />
+        <result property="dqczry"    column="dqczry"    />
+        <result property="fldzt"    column="fldzt"    />
+        <result property="fuid"    column="fuid"    />
+    </resultMap>
+
+    <sql id="selectFlsqdVo">
+        select id, hz_xm, hz_xb, hz_sr, hz_dh, hz_zyh, hz_ks, hz_bfys, hz_flys, hz_tbhl, hz_bs, gdfs, smsj, smzx, smxj, ch, smlx1, smlx2, kf, hes, bn, qsbj, bolus, khp, qit, txrhlx, txrhbh, cdw, zljs, zljq, igrt, igrtpllx, igrtplz, hxmk, jlyz, dqlcjdmc, dqczry, fldzt, fuid from flsqd
+    </sql>
+
+    <select id="selectFlsqdList" parameterType="Flsqd" resultMap="FlsqdResult">
+        <include refid="selectFlsqdVo"/>
+        <where>
+            <if test="id != null  and id != ''"> and id = #{id}</if>
+            <if test="hzXm != null  and hzXm != ''"> and hz_xm like concat('%', #{hzXm}, '%')</if>
+            <if test="hzXb != null  and hzXb != ''"> and hz_xb = #{hzXb}</if>
+            <if test="hzFlys != null  and hzFlys != ''"> and hz_flys = #{hzFlys}</if>
+            <if test="gdfs != null  and gdfs != ''"> and gdfs = #{gdfs}</if>
+            <if test="txrhlx != null  and txrhlx != ''"> and txrhlx = #{txrhlx}</if>
+            <if test="zljs != null  and zljs != ''"> and zljs = #{zljs}</if>
+            <if test="zljq != null  and zljq != ''"> and zljq = #{zljq}</if>
+            <if test="igrt != null  and igrt != ''"> and igrt = #{igrt}</if>
+            <if test="jlyz != null  and jlyz != ''"> and jlyz = #{jlyz}</if>
+            <if test="dqlcjdmc != null  and dqlcjdmc != ''"> and dqlcjdmc = #{dqlcjdmc}</if>
+            <if test="dqczry != null  and dqczry != ''"> and dqczry = #{dqczry}</if>
+            <if test="fldzt != null  and fldzt != ''"> and fldzt = #{fldzt}</if>
+        </where>
+    </select>
+
+    <select id="selectFlsqdById" parameterType="String" resultMap="FlsqdResult">
+        <include refid="selectFlsqdVo"/>
+        where id = #{id}
+    </select>
+
+    <insert id="insertFlsqd" parameterType="Flsqd">
+        insert into flsqd
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">id,</if>
+            <if test="hzXm != null and hzXm != ''">hz_xm,</if>
+            <if test="hzXb != null and hzXb != ''">hz_xb,</if>
+            <if test="hzSr != null">hz_sr,</if>
+            <if test="hzDh != null and hzDh != ''">hz_dh,</if>
+            <if test="hzZyh != null">hz_zyh,</if>
+            <if test="hzKs != null">hz_ks,</if>
+            <if test="hzBfys != null">hz_bfys,</if>
+            <if test="hzFlys != null and hzFlys != ''">hz_flys,</if>
+            <if test="hzTbhl != null and hzTbhl != ''">hz_tbhl,</if>
+            <if test="hzBs != null and hzBs != ''">hz_bs,</if>
+            <if test="gdfs != null and gdfs != ''">gdfs,</if>
+            <if test="smsj != null and smsj != ''">smsj,</if>
+            <if test="smzx != null and smzx != ''">smzx,</if>
+            <if test="smxj != null and smxj != ''">smxj,</if>
+            <if test="ch != null">ch,</if>
+            <if test="smlx1 != null and smlx1 != ''">smlx1,</if>
+            <if test="smlx2 != null and smlx2 != ''">smlx2,</if>
+            <if test="kf != null and kf != ''">kf,</if>
+            <if test="hes != null">hes,</if>
+            <if test="bn != null and bn != ''">bn,</if>
+            <if test="qsbj != null and qsbj != ''">qsbj,</if>
+            <if test="bolus != null and bolus != ''">bolus,</if>
+            <if test="khp != null and khp != ''">khp,</if>
+            <if test="qit != null and qit != ''">qit,</if>
+            <if test="txrhlx != null and txrhlx != ''">txrhlx,</if>
+            <if test="txrhbh != null and txrhbh != ''">txrhbh,</if>
+            <if test="cdw != null and cdw != ''">cdw,</if>
+            <if test="zljs != null and zljs != ''">zljs,</if>
+            <if test="zljq != null and zljq != ''">zljq,</if>
+            <if test="igrt != null and igrt != ''">igrt,</if>
+            <if test="igrtpllx != null and igrtpllx != ''">igrtpllx,</if>
+            <if test="igrtplz != null and igrtplz != ''">igrtplz,</if>
+            <if test="hxmk != null and hxmk != ''">hxmk,</if>
+            <if test="jlyz != null and jlyz != ''">jlyz,</if>
+            <if test="dqlcjdmc != null">dqlcjdmc,</if>
+            <if test="dqczry != null and dqczry != ''">dqczry,</if>
+            <if test="fldzt != null and fldzt != ''">fldzt,</if>
+            <if test="fuid != null and fuid != ''">fuid,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">#{id},</if>
+            <if test="hzXm != null and hzXm != ''">#{hzXm},</if>
+            <if test="hzXb != null and hzXb != ''">#{hzXb},</if>
+            <if test="hzSr != null">#{hzSr},</if>
+            <if test="hzDh != null and hzDh != ''">#{hzDh},</if>
+            <if test="hzZyh != null">#{hzZyh},</if>
+            <if test="hzKs != null">#{hzKs},</if>
+            <if test="hzBfys != null">#{hzBfys},</if>
+            <if test="hzFlys != null and hzFlys != ''">#{hzFlys},</if>
+            <if test="hzTbhl != null and hzTbhl != ''">#{hzTbhl},</if>
+            <if test="hzBs != null and hzBs != ''">#{hzBs},</if>
+            <if test="gdfs != null and gdfs != ''">#{gdfs},</if>
+            <if test="smsj != null and smsj != ''">#{smsj},</if>
+            <if test="smzx != null and smzx != ''">#{smzx},</if>
+            <if test="smxj != null and smxj != ''">#{smxj},</if>
+            <if test="ch != null">#{ch},</if>
+            <if test="smlx1 != null and smlx1 != ''">#{smlx1},</if>
+            <if test="smlx2 != null and smlx2 != ''">#{smlx2},</if>
+            <if test="kf != null and kf != ''">#{kf},</if>
+            <if test="hes != null">#{hes},</if>
+            <if test="bn != null and bn != ''">#{bn},</if>
+            <if test="qsbj != null and qsbj != ''">#{qsbj},</if>
+            <if test="bolus != null and bolus != ''">#{bolus},</if>
+            <if test="khp != null and khp != ''">#{khp},</if>
+            <if test="qit != null and qit != ''">#{qit},</if>
+            <if test="txrhlx != null and txrhlx != ''">#{txrhlx},</if>
+            <if test="txrhbh != null and txrhbh != ''">#{txrhbh},</if>
+            <if test="cdw != null and cdw != ''">#{cdw},</if>
+            <if test="zljs != null and zljs != ''">#{zljs},</if>
+            <if test="zljq != null and zljq != ''">#{zljq},</if>
+            <if test="igrt != null and igrt != ''">#{igrt},</if>
+            <if test="igrtpllx != null and igrtpllx != ''">#{igrtpllx},</if>
+            <if test="igrtplz != null and igrtplz != ''">#{igrtplz},</if>
+            <if test="hxmk != null and hxmk != ''">#{hxmk},</if>
+            <if test="jlyz != null and jlyz != ''">#{jlyz},</if>
+            <if test="dqlcjdmc != null">#{dqlcjdmc},</if>
+            <if test="dqczry != null and dqczry != ''">#{dqczry},</if>
+            <if test="fldzt != null and fldzt != ''">#{fldzt},</if>
+            <if test="fuid != null and fuid != ''">#{fuid},</if>
+        </trim>
+    </insert>
+
+    <update id="updateFlsqd" parameterType="Flsqd">
+        update flsqd
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="hzXm != null and hzXm != ''">hz_xm = #{hzXm},</if>
+            <if test="hzXb != null and hzXb != ''">hz_xb = #{hzXb},</if>
+            <if test="hzSr != null">hz_sr = #{hzSr},</if>
+            <if test="hzDh != null and hzDh != ''">hz_dh = #{hzDh},</if>
+            <if test="hzZyh != null">hz_zyh = #{hzZyh},</if>
+            <if test="hzKs != null">hz_ks = #{hzKs},</if>
+            <if test="hzBfys != null">hz_bfys = #{hzBfys},</if>
+            <if test="hzFlys != null and hzFlys != ''">hz_flys = #{hzFlys},</if>
+            <if test="hzTbhl != null and hzTbhl != ''">hz_tbhl = #{hzTbhl},</if>
+            <if test="hzBs != null and hzBs != ''">hz_bs = #{hzBs},</if>
+            <if test="gdfs != null and gdfs != ''">gdfs = #{gdfs},</if>
+            <if test="smsj != null and smsj != ''">smsj = #{smsj},</if>
+            <if test="smzx != null and smzx != ''">smzx = #{smzx},</if>
+            <if test="smxj != null and smxj != ''">smxj = #{smxj},</if>
+            <if test="ch != null">ch = #{ch},</if>
+            <if test="smlx1 != null and smlx1 != ''">smlx1 = #{smlx1},</if>
+            <if test="smlx2 != null and smlx2 != ''">smlx2 = #{smlx2},</if>
+            <if test="kf != null and kf != ''">kf = #{kf},</if>
+            <if test="hes != null">hes = #{hes},</if>
+            <if test="bn != null and bn != ''">bn = #{bn},</if>
+            <if test="qsbj != null and qsbj != ''">qsbj = #{qsbj},</if>
+            <if test="bolus != null and bolus != ''">bolus = #{bolus},</if>
+            <if test="khp != null and khp != ''">khp = #{khp},</if>
+            <if test="qit != null and qit != ''">qit = #{qit},</if>
+            <if test="txrhlx != null and txrhlx != ''">txrhlx = #{txrhlx},</if>
+            <if test="txrhbh != null and txrhbh != ''">txrhbh = #{txrhbh},</if>
+            <if test="cdw != null and cdw != ''">cdw = #{cdw},</if>
+            <if test="zljs != null and zljs != ''">zljs = #{zljs},</if>
+            <if test="zljq != null and zljq != ''">zljq = #{zljq},</if>
+            <if test="igrt != null and igrt != ''">igrt = #{igrt},</if>
+            <if test="igrtpllx != null and igrtpllx != ''">igrtpllx = #{igrtpllx},</if>
+            <if test="igrtplz != null and igrtplz != ''">igrtplz = #{igrtplz},</if>
+            <if test="hxmk != null and hxmk != ''">hxmk = #{hxmk},</if>
+            <if test="jlyz != null and jlyz != ''">jlyz = #{jlyz},</if>
+            <if test="dqlcjdmc != null">dqlcjdmc = #{dqlcjdmc},</if>
+            <if test="dqczry != null and dqczry != ''">dqczry = #{dqczry},</if>
+            <if test="fldzt != null and fldzt != ''">fldzt = #{fldzt},</if>
+            <if test="fuid != null and fuid != ''">fuid = #{fuid},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteFlsqdById" parameterType="String">
+        delete from flsqd where id = #{id}
+    </delete>
+
+    <delete id="deleteFlsqdByIds" parameterType="String">
+        delete from flsqd where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

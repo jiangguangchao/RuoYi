@@ -1,6 +1,8 @@
 package com.ruoyi.system.mapper;
 
 import java.util.List;
+
+import com.ruoyi.common.core.domain.entity.SysUserPostVo;
 import com.ruoyi.system.domain.SysPost;
 
 /**
@@ -48,6 +50,14 @@ public interface SysPostMapper
      * @return 结果
      */
     public List<SysPost> selectPostsByUserName(String userName);
+
+    /**
+     * 根据岗位代码查询用户
+     *
+     * @param postCode 岗位代码
+     * @return 结果
+     */
+    public List<SysUserPostVo> selectUserByPost(String postCode);
 
     /**
      * 删除岗位信息
