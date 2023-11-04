@@ -61,6 +61,15 @@ public class SysUserController extends BaseController
         return getDataTable(list);
     }
 
+//    @PreAuthorize("@ss.hasPermi('system:user:all')")
+    @GetMapping("/all")
+    public AjaxResult all(SysUser user)
+    {
+        startPage();
+        List<SysUser> list = userService.selectAllUsers();
+        return AjaxResult.success(list);
+    }
+
     @Log(title = "用户管理", businessType = BusinessType.EXPORT)
     @PreAuthorize("@ss.hasPermi('system:user:export')")
     @PostMapping("/export")
@@ -229,5 +238,10 @@ public class SysUserController extends BaseController
     {
         userService.insertUserAuth(userId, roleIds);
         return success();
+    }
+
+    public static void main(String[] args) {
+        System.out.println(SecurityUtils.encryptPassword(""));
+        //$2a$10$7JB720yubVSZvUI0rEqK/.VqGOZTH.ulu33dHOiBE8ByOhJIrdAu2
     }
 }

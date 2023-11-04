@@ -5,6 +5,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.alibaba.fastjson.JSON;
 import com.ruoyi.common.utils.DateUtils;
+import com.ruoyi.common.utils.SecurityUtils;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -45,6 +46,10 @@ public class FlsqdController extends BaseController
     public TableDataInfo list(Flsqd flsqd)
     {
         startPage();
+        Long userId = SecurityUtils.getUserId();
+        if (!SecurityUtils.isAdmin(userId)) {
+            flsqd.setDqczry(userId);
+        }
         List<Flsqd> list = flsqdService.selectFlsqdList(flsqd);
         return getDataTable(list);
     }
@@ -94,6 +99,16 @@ public class FlsqdController extends BaseController
 
         logger.info("开启放疗申请单 {}", JSON.toJSONString(flsqd));
         return toAjax(flsqdService.startLC(flsqd));
+    }
+
+    @PreAuthorize("@ss.hasPermi('fl:flsqd:sign')")
+    @Log(title = "放疗申请单", businessType = BusinessType.UPDATE)
+    @PostMapping("/sign")
+    public AjaxResult sign(@RequestBody Flsqd flsqd)
+    {
+
+        logger.info("放疗申请单签名 {}", JSON.toJSONString(flsqd));
+        return toAjax(flsqdService.sign(flsqd, null));
     }
 
     /**
