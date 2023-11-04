@@ -26,6 +26,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     <select id="selectFllcjlByFlid" parameterType="String" resultMap="FllcjlResult">
         <include refid="selectFllcjlVo"/>
         where flid = #{flid}
+        order by czsj asc
     </select>
         
     <insert id="insertFllcjl" parameterType="Fllcjl">
