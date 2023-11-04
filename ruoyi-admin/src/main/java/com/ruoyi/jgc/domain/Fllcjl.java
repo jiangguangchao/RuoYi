@@ -9,9 +9,9 @@ import com.ruoyi.common.core.domain.BaseEntity;
 
 /**
  * 放疗流程记录对象 fllcjl
- * 
+ *
  * @author ruoyi
- * @date 2023-10-31
+ * @date 2023-11-04
  */
 public class Fllcjl extends BaseEntity
 {
@@ -19,6 +19,9 @@ public class Fllcjl extends BaseEntity
 
     /** 放疗申请单id */
     private String flid;
+
+    /** $column.columnComment */
+    private Long id;
 
     /** 流程节点 */
     @Excel(name = "流程节点")
@@ -37,21 +40,30 @@ public class Fllcjl extends BaseEntity
     @Excel(name = "操作时间", width = 30, dateFormat = "yyyy-MM-dd")
     private Date czsj;
 
-    public void setFlid(String flid) 
+    public void setFlid(String flid)
     {
         this.flid = flid;
     }
 
-    public String getFlid() 
+    public String getFlid()
     {
         return flid;
     }
-    public void setLcjdmc(String lcjdmc) 
+    public void setId(Long id)
+    {
+        this.id = id;
+    }
+
+    public Long getId()
+    {
+        return id;
+    }
+    public void setLcjdmc(String lcjdmc)
     {
         this.lcjdmc = lcjdmc;
     }
 
-    public String getLcjdmc() 
+    public String getLcjdmc()
     {
         return lcjdmc;
     }
@@ -64,21 +76,21 @@ public class Fllcjl extends BaseEntity
     {
         return lcjdxh;
     }
-    public void setCzr(Long czr) 
+    public void setCzr(Long czr)
     {
         this.czr = czr;
     }
 
-    public Long getCzr() 
+    public Long getCzr()
     {
         return czr;
     }
-    public void setCzsj(Date czsj) 
+    public void setCzsj(Date czsj)
     {
         this.czsj = czsj;
     }
 
-    public Date getCzsj() 
+    public Date getCzsj()
     {
         return czsj;
     }
@@ -86,11 +98,12 @@ public class Fllcjl extends BaseEntity
     @Override
     public String toString() {
         return new ToStringBuilder(this,ToStringStyle.MULTI_LINE_STYLE)
-            .append("flid", getFlid())
-            .append("lcjdmc", getLcjdmc())
-            .append("lcjdxh", getLcjdxh())
-            .append("czr", getCzr())
-            .append("czsj", getCzsj())
-            .toString();
+                .append("flid", getFlid())
+                .append("id", getId())
+                .append("lcjdmc", getLcjdmc())
+                .append("lcjdxh", getLcjdxh())
+                .append("czr", getCzr())
+                .append("czsj", getCzsj())
+                .toString();
     }
 }

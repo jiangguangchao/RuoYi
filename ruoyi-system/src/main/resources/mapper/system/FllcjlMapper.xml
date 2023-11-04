@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper
-PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
-"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.ruoyi.jgc.mapper.FllcjlMapper">
-    
+
     <resultMap type="Fllcjl" id="FllcjlResult">
         <result property="flid"    column="flid"    />
+        <result property="id"    column="id"    />
         <result property="lcjdmc"    column="lcjdmc"    />
         <result property="lcjdxh"    column="lcjdxh"    />
         <result property="czr"    column="czr"    />
@@ -13,43 +14,46 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </resultMap>
 
     <sql id="selectFllcjlVo">
-        select flid, lcjdmc, lcjdxh, czr, czsj from fllcjl
+        select flid, id, lcjdmc, lcjdxh, czr, czsj from fllcjl
     </sql>
 
     <select id="selectFllcjlList" parameterType="Fllcjl" resultMap="FllcjlResult">
         <include refid="selectFllcjlVo"/>
-        <where>  
+        <where>
             <if test="flid != null  and flid != ''"> and flid = #{flid}</if>
         </where>
+        order by czsj asc
     </select>
-    
+
     <select id="selectFllcjlByFlid" parameterType="String" resultMap="FllcjlResult">
         <include refid="selectFllcjlVo"/>
         where flid = #{flid}
-        order by czsj asc
     </select>
-        
+
     <insert id="insertFllcjl" parameterType="Fllcjl">
         insert into fllcjl
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="flid != null">flid,</if>
+            <if test="id != null">id,</if>
             <if test="lcjdmc != null and lcjdmc != ''">lcjdmc,</if>
             <if test="lcjdxh != null">lcjdxh,</if>
             <if test="czr != null">czr,</if>
             <if test="czsj != null">czsj,</if>
-         </trim>
+        </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="flid != null">#{flid},</if>
+            <if test="id != null">#{id},</if>
             <if test="lcjdmc != null and lcjdmc != ''">#{lcjdmc},</if>
             <if test="lcjdxh != null">#{lcjdxh},</if>
             <if test="czr != null">#{czr},</if>
             <if test="czsj != null">#{czsj},</if>
-         </trim>
+        </trim>
     </insert>
 
     <update id="updateFllcjl" parameterType="Fllcjl">
         update fllcjl
         <trim prefix="SET" suffixOverrides=",">
+            <if test="id != null">id = #{id},</if>
             <if test="lcjdmc != null and lcjdmc != ''">lcjdmc = #{lcjdmc},</if>
             <if test="lcjdxh != null">lcjdxh = #{lcjdxh},</if>
             <if test="czr != null">czr = #{czr},</if>
@@ -63,7 +67,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </delete>
 
     <delete id="deleteFllcjlByFlids" parameterType="String">
-        delete from fllcjl where flid in 
+        delete from fllcjl where flid in
         <foreach item="flid" collection="array" open="(" separator="," close=")">
             #{flid}
         </foreach>
