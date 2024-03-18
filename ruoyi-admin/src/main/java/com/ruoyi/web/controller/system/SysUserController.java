@@ -214,6 +214,19 @@ public class SysUserController extends BaseController
     }
 
     /**
+     * 接受任务状态修改
+     */
+    @PreAuthorize("@ss.hasPermi('system:user:assign')")
+    @Log(title = "用户管理", businessType = BusinessType.UPDATE)
+    @PutMapping("/assignWork")
+    public AjaxResult assignWork(@RequestBody SysUser user)
+    {
+        userService.checkUserAllowed(user);
+        user.setUpdateBy(getUsername());
+        return toAjax(userService.updateUserAssignWork(user));
+    }
+
+    /**
      * 根据用户编号获取授权角色
      */
     @PreAuthorize("@ss.hasPermi('system:user:query')")

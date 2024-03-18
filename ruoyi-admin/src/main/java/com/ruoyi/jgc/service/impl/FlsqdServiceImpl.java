@@ -3,6 +3,7 @@ package com.ruoyi.jgc.service.impl;
 import java.util.BitSet;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import com.ruoyi.common.core.domain.entity.SysUserPostVo;
 import com.ruoyi.jgc.domain.Fllcjl;
@@ -39,7 +40,7 @@ public class FlsqdServiceImpl implements IFlsqdService
     @Autowired
     private FllcjlMapper fllcjlMapper;
 
-    private static final String[] lcArr = {"dw", "bqgh", "bqhz","bqtj","jhsj","jhhz","fwyz"};
+    public static final String[] lcArr = {"dw", "bqgh", "bqhz","bqtj","jhsj","jhhz","fwyz"};
 
     private static final Logger log = LoggerFactory.getLogger(FlsqdServiceImpl.class);
 
@@ -192,6 +193,15 @@ public class FlsqdServiceImpl implements IFlsqdService
             log.error("根据岗位[{}]查询不到所在岗位人员", postCode);
             return null;
         }
+
+        List<SysUserPostVo> userList = sysUserPostVos.stream()
+                .filter(u -> "0".equals(u.getStatus()) && "1".equals(u.getAssignWork()))
+                .collect(Collectors.toList());
+        if (CollectionUtils.isEmpty(userList)) {
+            log.error("根据岗位[{}]查询到的用户，无法接受工作", postCode);
+            return null;
+        }
+
         int i = RandomUtils.nextInt(0, sysUserPostVos.size());
         return sysUserPostVos.get(i).getUserId();
     }

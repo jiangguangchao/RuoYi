@@ -4,9 +4,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import javax.validation.Validator;
+
+import com.ruoyi.common.enums.UserStatus;
+import com.ruoyi.system.event.domain.UserPostEvent;
+import com.ruoyi.system.event.domain.UserStatusEvent;
+import org.apache.commons.lang3.ArrayUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
@@ -60,6 +66,9 @@ public class SysUserServiceImpl implements ISysUserService
 
     @Autowired
     protected Validator validator;
+
+    @Autowired
+    private ApplicationEventPublisher eventPublisher;
 
     /**
      * 根据条件分页查询用户列表
@@ -326,7 +335,38 @@ public class SysUserServiceImpl implements ISysUserService
     @Override
     public int updateUserStatus(SysUser user)
     {
-        return userMapper.updateUser(user);
+        int r = userMapper.updateUser(user);
+        if (r == 1) {
+            publishUserStatusEvent(user);
+        }
+        return r;
+    }
+
+    public void publishUserStatusEvent(SysUser user) {
+
+        String postCode = null;
+        SysUser sysUser = selectUserById(user.getUserId());
+        List<SysPost> list = postMapper.selectPostsByUserName(sysUser.getUserName());
+        if (!CollectionUtils.isEmpty(list)) {
+            postCode = list.get(0).getPostCode();
+        }
+
+        eventPublisher.publishEvent(new UserStatusEvent(this, sysUser.getUserId(), sysUser.getStatus(),
+                sysUser.getAssignWork(), postCode));
+
+    }
+
+    public void publishUserPostEvent(SysUser user, String prePostCode) {
+
+        String postCode = null;
+        SysUser sysUser = selectUserById(user.getUserId());
+        List<SysPost> list = postMapper.selectPostsByUserName(sysUser.getUserName());
+        if (!CollectionUtils.isEmpty(list)) {
+            postCode = list.get(0).getPostCode();
+        }
+
+        eventPublisher.publishEvent(new UserPostEvent(this, sysUser.getUserId(), postCode, prePostCode));
+
     }
 
     /**
@@ -352,6 +392,16 @@ public class SysUserServiceImpl implements ISysUserService
     public boolean updateUserAvatar(String userName, String avatar)
     {
         return userMapper.updateUserAvatar(userName, avatar) > 0;
+    }
+
+    @Override
+    public int updateUserAssignWork(SysUser user) {
+
+        int r = userMapper.updateUser(user);
+        if (r == 1) {
+            publishUserStatusEvent(user);
+        }
+        return r;
     }
 
     /**
@@ -429,6 +479,7 @@ public class SysUserServiceImpl implements ISysUserService
                 userPostMapper.batchUserPost(list);
             }
         }
+        publishUserStatusEvent(user);
     }
 
     /**
@@ -467,11 +518,21 @@ public class SysUserServiceImpl implements ISysUserService
     @Transactional
     public int deleteUserById(Long userId)
     {
+        String prePostCode = null;
+        List<Long> longs = postMapper.selectPostListByUserId(userId);
+        if (!CollectionUtils.isEmpty(longs)) {
+            prePostCode = postMapper.selectPostById(longs.get(0)).getPostCode();
+        }
         // 删除用户与角色关联
         userRoleMapper.deleteUserRoleByUserId(userId);
         // 删除用户与岗位表
         userPostMapper.deleteUserPostByUserId(userId);
-        return userMapper.deleteUserById(userId);
+        int r = userMapper.deleteUserById(userId);
+        if (r == 1 && prePostCode != null) {
+            SysUser u = new SysUser(userId);
+            publishUserStatusEvent(u);
+        }
+        return r;
     }
 
     /**
@@ -492,6 +553,11 @@ public class SysUserServiceImpl implements ISysUserService
         userRoleMapper.deleteUserRole(userIds);
         // 删除用户与岗位关联
         userPostMapper.deleteUserPost(userIds);
+        for (Long userId : userIds) {
+            SysUser u = new SysUser();
+            u.setUserId(userId);
+            publishUserStatusEvent(u);
+        }
         return userMapper.deleteUserByIds(userIds);
     }
 

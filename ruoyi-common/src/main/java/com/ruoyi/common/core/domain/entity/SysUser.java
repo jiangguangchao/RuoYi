@@ -94,6 +94,9 @@ public class SysUser extends BaseEntity
     /** 角色ID */
     private Long roleId;
 
+    /** 是否可以接受分配的任务（例如长期休假可以设置为0）。0-不接受  1-接受 */
+    private String assignWork;
+
     public SysUser()
     {
 
@@ -314,6 +317,14 @@ public class SysUser extends BaseEntity
         this.roleId = roleId;
     }
 
+    public String getAssignWork() {
+        return assignWork;
+    }
+
+    public void setAssignWork(String assignWork) {
+        this.assignWork = assignWork;
+    }
+
     @Override
     public String toString() {
         return new ToStringBuilder(this,ToStringStyle.MULTI_LINE_STYLE)
@@ -337,6 +348,7 @@ public class SysUser extends BaseEntity
             .append("updateTime", getUpdateTime())
             .append("remark", getRemark())
             .append("dept", getDept())
+            .append("assignWork", getAssignWork())
             .toString();
     }
 }

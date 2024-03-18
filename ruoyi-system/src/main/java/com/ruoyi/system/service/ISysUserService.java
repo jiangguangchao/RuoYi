@@ -165,6 +165,14 @@ public interface ISysUserService
     public boolean updateUserAvatar(String userName, String avatar);
 
     /**
+     * 修改用户接受任务状态
+     *
+     * @param user 用户信息
+     * @return 结果
+     */
+    public int updateUserAssignWork(SysUser user);
+
+    /**
      * 重置用户密码
      * 
      * @param user 用户信息

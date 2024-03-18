@@ -38,7 +38,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 	</select>
 
 	<select id="selectUserByPost" parameterType="string" resultType="SysUserPostVo">
-		select post_code, post_name, u.user_id, u.user_name, u.status
+		select post_code, post_name, u.user_id, u.user_name, u.status, u.assign_work
 		from sys_post p
 		left join sys_user_post up on p.post_id = up.post_id
 		left join sys_user u on up.user_id = u.user_id
