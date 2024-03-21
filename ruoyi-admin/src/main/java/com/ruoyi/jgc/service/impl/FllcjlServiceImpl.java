@@ -53,7 +53,7 @@ public class FllcjlServiceImpl implements IFllcjlService
     }
 
     @Override
-    public List<WorkloadDto> workloadStat(WorkloadQuery query) {
+    public List<WorkloadDto> workloadStat(Fllcjl query) {
         return fllcjlMapper.workloadStat(query);
     }
 

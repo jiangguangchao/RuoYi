@@ -32,7 +32,7 @@ public interface FllcjlMapper
 
     public List<FllcjlDto> selectWorkload(Fllcjl query);
 
-    public List<WorkloadDto> workloadStat(WorkloadQuery query);
+    public List<WorkloadDto> workloadStat(Fllcjl query);
 
     /**
      * 新增放疗流程记录

@@ -56,7 +56,7 @@ public class WorkLoadController extends BaseController {
 
     @PreAuthorize("@ss.hasPermi('fl:workload:stat')")
     @GetMapping("/stat")
-    public List<WorkloadDto> workloadStat(WorkloadQuery query)
+    public List<WorkloadDto> workloadStat(Fllcjl query)
     {
         List<WorkloadDto> list = fllcjlService.workloadStat(query);
         List<SysUser> sysUsers = userService.selectAllUsers();
