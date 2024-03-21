@@ -2,12 +2,16 @@ package com.ruoyi.jgc.controller;
 
 import com.ruoyi.common.core.controller.BaseController;
 import com.ruoyi.common.core.domain.entity.SysUser;
+import com.ruoyi.common.core.domain.entity.SysUserPostVo;
 import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.jgc.domain.Fllcjl;
 import com.ruoyi.jgc.domain.FllcjlDto;
 import com.ruoyi.jgc.domain.WorkloadDto;
 import com.ruoyi.jgc.domain.WorkloadQuery;
 import com.ruoyi.jgc.service.IFllcjlService;
+import com.ruoyi.jgc.service.impl.AssignWorkServiceImpl;
+import com.ruoyi.jgc.service.impl.FlsqdServiceImpl;
+import com.ruoyi.system.service.ISysPostService;
 import com.ruoyi.system.service.ISysUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -15,6 +19,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -36,6 +41,8 @@ public class WorkLoadController extends BaseController {
     private IFllcjlService fllcjlService;
     @Autowired
     private ISysUserService userService;
+    @Autowired
+    private ISysPostService postService;
 
 
     @PreAuthorize("@ss.hasPermi('fl:workload:list')")
@@ -67,5 +74,16 @@ public class WorkLoadController extends BaseController {
 
         return resultList;
     }
+
+    @GetMapping("/fls")
+    public List getFls() {
+        List<SysUserPostVo> list = new ArrayList<>();
+        for (String s : AssignWorkServiceImpl.postArr) {
+            List<SysUserPostVo> sysUserPostVos = postService.selectUserByPost(s);
+            list.addAll(sysUserPostVos);
+        }
+        return list;
+    }
+
 
 }
