@@ -32,20 +32,17 @@
         where flid = #{flid}
     </select>
 
-    <select id="selectWorkload" parameterType="WorkloadQuery" resultMap="FllcjlResult">
+    <select id="selectWorkload" parameterType="Fllcjl" resultMap="FllcjlResult">
         select flid, jl.id, lcjdmc, lcjdxh, czr, czsj, u.user_name czrmc
         from fllcjl jl left join sys_user u on jl.czr = u.user_id
         where u.del_flag = '0'
-        <where>
-
-            <if test="czr != null">
-                czr = #{czr}
+        <if test="czr != null">
+                and czr = #{czr}
             </if>
-            <if test="beginTime != null and beginTime != '' and endTime != null and endTime != ''">
-                and czsj &gt;= #{beginTime}
-                and czsj &lt;= #{endTime}
+            <if test="params.beginTime != null and params.beginTime != '' and params.endTime != null and params.endTime != ''">
+                and czsj &gt;= #{params.beginTime}
+                and czsj &lt;= #{params.endTime}
             </if>
-        </where>
     </select>
 
     <select id="workloadStat" parameterType="WorkloadQuery" resultType="WorkloadDto">

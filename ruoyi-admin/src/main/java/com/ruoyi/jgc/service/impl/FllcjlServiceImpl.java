@@ -48,7 +48,7 @@ public class FllcjlServiceImpl implements IFllcjlService
     }
 
     @Override
-    public List<FllcjlDto> selectWorkload(WorkloadQuery query) {
+    public List<FllcjlDto> selectWorkload(Fllcjl query) {
         return fllcjlMapper.selectWorkload(query);
     }
 

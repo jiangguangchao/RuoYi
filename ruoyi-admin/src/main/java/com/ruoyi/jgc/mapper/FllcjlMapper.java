@@ -30,7 +30,7 @@ public interface FllcjlMapper
      */
     public List<FllcjlDto> selectFllcjlList(Fllcjl fllcjl);
 
-    public List<FllcjlDto> selectWorkload(WorkloadQuery query);
+    public List<FllcjlDto> selectWorkload(Fllcjl query);
 
     public List<WorkloadDto> workloadStat(WorkloadQuery query);
 

@@ -47,7 +47,7 @@ public class WorkLoadController extends BaseController {
 
     @PreAuthorize("@ss.hasPermi('fl:workload:list')")
     @GetMapping("/list")
-    public TableDataInfo list(WorkloadQuery query)
+    public TableDataInfo list(Fllcjl query)
     {
         startPage();
         List<FllcjlDto> list = fllcjlService.selectWorkload(query);
