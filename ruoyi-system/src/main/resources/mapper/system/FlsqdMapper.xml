@@ -78,9 +78,9 @@
 <!--            <if test="params.endTime != null and params.endTime != ''">&lt;!&ndash; 结束时间检索 &ndash;&gt;-->
 <!--                AND date_format(u.create_time,'%y%m%d') &lt;= date_format(#{params.endTime},'%y%m%d')-->
 <!--            </if>-->
-            <if test="beginTime != null and beginTime != '' and endTime != null and endTime != ''">
-                and create_time &gt;= #{beginTime}
-                and create_time &lt;= #{endTime}
+            <if test="params.beginTime != null and params.beginTime != '' and params.endTime != null and params.endTime != ''">
+                and create_time &gt;= #{params.beginTime}
+                and create_time &lt;= #{params.endTime}
             </if>
         </where>
     </select>
