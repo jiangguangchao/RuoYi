@@ -13,7 +13,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @program: ruoyi
@@ -37,8 +39,18 @@ public class AssignWorkController extends BaseController {
     {
         log.info("查询岗位任务分配顺序入口参数 {}", postCode);
         List<SysUserPostVo> assignUsersByPost = assignWorkService.getAssignUsersByPost(postCode);
-        log.info("查询岗位任务分配顺序 结果 {}", assignUsersByPost);
-        return assignUsersByPost;
 
+        List<String> userNames = assignUsersByPost.stream().map(u -> u.getUserName()).collect(Collectors.toList());
+        log.info("查询岗位任务分配顺序 结果 {}", userNames);
+        return assignUsersByPost;
     }
+
+    @GetMapping("/refresh")
+    public List<SysUserPostVo> refresh(String postCode)
+    {
+        List<SysUserPostVo> assignUsersByPost = assignWorkService.refreshAssignUsersByPost(postCode);
+        return assignUsersByPost;
+    }
+
+
 }

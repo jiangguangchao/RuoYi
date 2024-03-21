@@ -2,6 +2,9 @@ package com.ruoyi.jgc.mapper;
 
 import java.util.List;
 import com.ruoyi.jgc.domain.Fllcjl;
+import com.ruoyi.jgc.domain.FllcjlDto;
+import com.ruoyi.jgc.domain.WorkloadDto;
+import com.ruoyi.jgc.domain.WorkloadQuery;
 
 /**
  * 放疗流程记录Mapper接口
@@ -17,7 +20,7 @@ public interface FllcjlMapper
      * @param flid 放疗流程记录主键
      * @return 放疗流程记录
      */
-    public Fllcjl selectFllcjlByFlid(String flid);
+    public FllcjlDto selectFllcjlByFlid(String flid);
 
     /**
      * 查询放疗流程记录列表
@@ -25,7 +28,11 @@ public interface FllcjlMapper
      * @param fllcjl 放疗流程记录
      * @return 放疗流程记录集合
      */
-    public List<Fllcjl> selectFllcjlList(Fllcjl fllcjl);
+    public List<FllcjlDto> selectFllcjlList(Fllcjl fllcjl);
+
+    public List<FllcjlDto> selectWorkload(WorkloadQuery query);
+
+    public List<WorkloadDto> workloadStat(WorkloadQuery query);
 
     /**
      * 新增放疗流程记录
@@ -58,4 +65,6 @@ public interface FllcjlMapper
      * @return 结果
      */
     public int deleteFllcjlByFlids(String[] flids);
+
+
 }

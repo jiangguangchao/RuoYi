@@ -2,6 +2,8 @@ package com.ruoyi.jgc.controller;
 
 import java.util.List;
 import javax.servlet.http.HttpServletResponse;
+
+import com.ruoyi.jgc.domain.FllcjlDto;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -42,7 +44,7 @@ public class FllcjlController extends BaseController
     public TableDataInfo list(Fllcjl fllcjl)
     {
         startPage();
-        List<Fllcjl> list = fllcjlService.selectFllcjlList(fllcjl);
+        List<FllcjlDto> list = fllcjlService.selectFllcjlList(fllcjl);
         return getDataTable(list);
     }
 
@@ -54,9 +56,9 @@ public class FllcjlController extends BaseController
     @PostMapping("/export")
     public void export(HttpServletResponse response, Fllcjl fllcjl)
     {
-        List<Fllcjl> list = fllcjlService.selectFllcjlList(fllcjl);
-        ExcelUtil<Fllcjl> util = new ExcelUtil<Fllcjl>(Fllcjl.class);
-        util.exportExcel(response, list, "放疗流程记录数据");
+//        List<FllcjlDto> list = fllcjlService.selectFllcjlList(fllcjl);
+//        ExcelUtil<FllcjlDto> util = new ExcelUtil<FllcjlDto>(FllcjlDto.class);
+//        util.exportExcel(response, list, "放疗流程记录数据");
     }
 
     /**

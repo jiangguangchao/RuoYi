@@ -275,6 +275,7 @@ public class SysUserServiceImpl implements ISysUserService
         insertUserPost(user);
         // 新增用户与角色管理
         insertUserRole(user);
+        publishUserStatusEvent(user);
         return rows;
     }
 

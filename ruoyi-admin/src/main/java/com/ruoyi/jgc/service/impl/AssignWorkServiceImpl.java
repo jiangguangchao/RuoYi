@@ -17,7 +17,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -48,12 +50,12 @@ public class AssignWorkServiceImpl implements IAssignWorkService {
         if (!ArrayUtils.contains(postArr, postCode)) {
             return null;
         }
-        String redisKey = FLSQD_ASSIGN_WORK_POST_ + postCode;
-        List<SysUserPostVo> cacheList = redisCache.getCacheList(redisKey);
-        if (CollectionUtils.isEmpty(cacheList)) {
-            cacheList = refreshAssignUsersByPost(postCode);
-        }
-        return cacheList;
+//        String redisKey = FLSQD_ASSIGN_WORK_POST_ + postCode;
+//        List<SysUserPostVo> cacheList = redisCache.getCacheList(redisKey);
+//        if (CollectionUtils.isEmpty(cacheList)) {
+//            cacheList = refreshAssignUsersByPost(postCode);
+//        }
+        return refreshAssignUsersByPost(postCode);
     }
 
     @Override
@@ -61,6 +63,7 @@ public class AssignWorkServiceImpl implements IAssignWorkService {
         if (!ArrayUtils.contains(postArr, postCode)) {
             return null;
         }
+        log.info("开始执行岗位[{}]任务分配顺序刷新处理", postCode);
         List<SysUserPostVo> sysUserPostVos = postService.selectUserByPost(postCode);
         if (sysUserPostVos == null) {
             sysUserPostVos = new ArrayList<>();
@@ -78,7 +81,9 @@ public class AssignWorkServiceImpl implements IAssignWorkService {
             cacheList = new ArrayList<>();
         }
 
+        Set<Long> userIdSet = new HashSet<>();
         List<SysUserPostVo> collect = cacheList.stream()
+                .filter(u -> userIdSet.add(u.getUserId()))
                 .filter(u -> userIdsAtPost.contains(u.getUserId()))
                 .collect(Collectors.toList());
 
@@ -100,8 +105,10 @@ public class AssignWorkServiceImpl implements IAssignWorkService {
         if (!ArrayUtils.contains(postArr, postCode)) {
             return false;
         }
+
         SysUser sysUser = sysUserService.selectUserById(userId);
         String userName = sysUser.getUserName();
+        log.info("开始在岗位[{}]任务顺序中加入用户[{}]", postCode, userName);
         if ("1".equals(sysUser.getStatus()) || "0".equals(sysUser.getAssignWork())) {
             log.error("当前用户[{}]状态已停用或停止接受任务分配，无法加入岗位[{}]分配任务序列中", userName, postCode);
             throw new ServiceException("当前用户状态已停用或停止接受任务分配，无法加入当前岗位分配任务序列中");
@@ -133,6 +140,7 @@ public class AssignWorkServiceImpl implements IAssignWorkService {
         }
         SysUser sysUser = sysUserService.selectUserById(userId);
         String userName = sysUser.getUserName();
+        log.info("开始从岗位[{}]任务顺序中移除用户[{}]", postCode, userName);
         String redisKey = FLSQD_ASSIGN_WORK_POST_ + postCode;
         List<SysUserPostVo> cacheList = redisCache.getCacheList(redisKey);
         if (cacheList == null) {
@@ -159,6 +167,7 @@ public class AssignWorkServiceImpl implements IAssignWorkService {
         }
         SysUser sysUser = sysUserService.selectUserById(userId);
         String userName = sysUser.getUserName();
+        log.info("用户[{}]岗位变化[{} ==> {}]，开始执行岗位任务分配顺序处理", userName, prePostCode, postCode);
         if ("1".equals(sysUser.getStatus()) || "0".equals(sysUser.getAssignWork())) {
             log.error("当前用户[{}]岗位发生变化，但状态已停用或停止接受任务分配，不做岗位任务分配序列处理", userName);
             return;

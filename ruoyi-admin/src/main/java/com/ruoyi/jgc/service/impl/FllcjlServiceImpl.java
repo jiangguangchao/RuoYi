@@ -1,6 +1,10 @@
 package com.ruoyi.jgc.service.impl;
 
 import java.util.List;
+
+import com.ruoyi.jgc.domain.FllcjlDto;
+import com.ruoyi.jgc.domain.WorkloadDto;
+import com.ruoyi.jgc.domain.WorkloadQuery;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.ruoyi.jgc.mapper.FllcjlMapper;
@@ -38,9 +42,19 @@ public class FllcjlServiceImpl implements IFllcjlService
      * @return 放疗流程记录
      */
     @Override
-    public List<Fllcjl> selectFllcjlList(Fllcjl fllcjl)
+    public List<FllcjlDto> selectFllcjlList(Fllcjl fllcjl)
     {
         return fllcjlMapper.selectFllcjlList(fllcjl);
+    }
+
+    @Override
+    public List<FllcjlDto> selectWorkload(WorkloadQuery query) {
+        return fllcjlMapper.selectWorkload(query);
+    }
+
+    @Override
+    public List<WorkloadDto> workloadStat(WorkloadQuery query) {
+        return fllcjlMapper.workloadStat(query);
     }
 
     /**

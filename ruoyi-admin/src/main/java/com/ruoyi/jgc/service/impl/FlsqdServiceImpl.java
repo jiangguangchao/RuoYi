@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import com.ruoyi.common.core.domain.entity.SysUserPostVo;
+import com.ruoyi.common.exception.ServiceException;
 import com.ruoyi.jgc.domain.Fllcjl;
 import com.ruoyi.jgc.mapper.FllcjlMapper;
 import com.ruoyi.system.mapper.SysPostMapper;
@@ -77,6 +78,11 @@ public class FlsqdServiceImpl implements IFlsqdService
     @Override
     public int insertFlsqd(Flsqd flsqd)
     {
+        if (!StringUtils.hasText(flsqd.getCreateBy())) {
+            log.error("放疗单创建人不能为空");
+            throw new ServiceException("放疗单创建人不能为空");
+        }
+        flsqd.setCreateTime(new Date());
         String fldzt = flsqd.getFldzt();
         int r = flsqdMapper.insertFlsqd(flsqd);
         if (fldzt.equals("jxz") && r > 0) {

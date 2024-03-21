@@ -2,6 +2,9 @@ package com.ruoyi.jgc.service;
 
 import java.util.List;
 import com.ruoyi.jgc.domain.Fllcjl;
+import com.ruoyi.jgc.domain.FllcjlDto;
+import com.ruoyi.jgc.domain.WorkloadDto;
+import com.ruoyi.jgc.domain.WorkloadQuery;
 
 /**
  * 放疗流程记录Service接口
@@ -25,7 +28,11 @@ public interface IFllcjlService
      * @param fllcjl 放疗流程记录
      * @return 放疗流程记录集合
      */
-    public List<Fllcjl> selectFllcjlList(Fllcjl fllcjl);
+    public List<FllcjlDto> selectFllcjlList(Fllcjl fllcjl);
+
+    public List<FllcjlDto> selectWorkload(WorkloadQuery query);
+
+    public List<WorkloadDto> workloadStat(WorkloadQuery query);
 
     /**
      * 新增放疗流程记录
