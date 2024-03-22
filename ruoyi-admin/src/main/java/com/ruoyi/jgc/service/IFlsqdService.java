@@ -27,6 +27,8 @@ public interface IFlsqdService
      */
     public List<Flsqd> selectFlsqdList(Flsqd flsqd);
 
+    public String getNewId();
+
     /**
      * 新增放疗申请单
      * 

@@ -77,6 +77,12 @@ public class FlsqdController extends BaseController
         return AjaxResult.success(flsqdService.selectFlsqdById(id));
     }
 
+    @GetMapping(value = "/newId")
+    public AjaxResult getNewId()
+    {
+        return AjaxResult.success("success", flsqdService.getNewId());
+    }
+
     /**
      * 新增放疗申请单
      */

@@ -2,14 +2,19 @@ package com.ruoyi.jgc.service.impl;
 
 import java.util.BitSet;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import com.ruoyi.common.core.domain.entity.SysUserPostVo;
+import com.ruoyi.common.core.redis.RedisCache;
 import com.ruoyi.common.exception.ServiceException;
+import com.ruoyi.common.utils.DateUtils;
 import com.ruoyi.jgc.domain.Fllcjl;
 import com.ruoyi.jgc.mapper.FllcjlMapper;
 import com.ruoyi.system.mapper.SysPostMapper;
+import com.sun.jna.platform.win32.Winspool;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.RandomUtils;
 import org.apache.ibatis.reflection.ArrayUtil;
@@ -41,6 +46,11 @@ public class FlsqdServiceImpl implements IFlsqdService
     @Autowired
     private FllcjlMapper fllcjlMapper;
 
+    @Autowired
+    private RedisCache redisCache;
+
+    public static final String FLSQD_ID_CACHE_KEY = "FLSQD_ID_CACHE_KEY";
+
     public static final String[] lcArr = {"dw", "bqgh", "bqhz","bqtj","jhsj","jhhz","fwyz"};
 
     private static final Logger log = LoggerFactory.getLogger(FlsqdServiceImpl.class);
@@ -69,6 +79,42 @@ public class FlsqdServiceImpl implements IFlsqdService
         return flsqdMapper.selectFlsqdList(flsqd);
     }
 
+    @Override
+    public String getNewId() {
+        Map<String, Object> flsqdIdMap = redisCache.getCacheMap(FLSQD_ID_CACHE_KEY);
+        if (CollectionUtils.isEmpty(flsqdIdMap)) {
+            flsqdIdMap = new HashMap<>();
+            flsqdIdMap.put("year", DateUtils.parseDateToStr("yyyy", new Date()));
+            flsqdIdMap.put("idNum", 1);
+        }
+
+        String year = (String) flsqdIdMap.get("year");
+        Integer newIdNum = (Integer) flsqdIdMap.get("idNum");
+        if (!DateUtils.parseDateToStr("yyyy", new Date()).equals(year)) {
+            year = DateUtils.parseDateToStr("yyyy", new Date());
+            newIdNum = 1;
+            flsqdIdMap.put("year", year);
+            flsqdIdMap.put("idNum", newIdNum);
+            redisCache.setCacheMap(FLSQD_ID_CACHE_KEY, flsqdIdMap);
+        }
+        String fldId = flsqdIdMap.get("year") + "-" + newIdNum;
+        return fldId;
+    }
+
+    public boolean updateNewId() {
+        Map<String, Object> flsqdIdMap = redisCache.getCacheMap(FLSQD_ID_CACHE_KEY);
+        if (CollectionUtils.isEmpty(flsqdIdMap)) {
+            flsqdIdMap = new HashMap<>();
+            flsqdIdMap.put("year", DateUtils.parseDateToStr("yyyy", new Date()));
+            flsqdIdMap.put("idNum", 1);
+        } else {
+            flsqdIdMap.put("idNum", (Integer)flsqdIdMap.get("idNum") + 1);
+        }
+
+        redisCache.setCacheMap(FLSQD_ID_CACHE_KEY, flsqdIdMap);
+        return true;
+    }
+
     /**
      * 新增放疗申请单
      * 
@@ -82,9 +128,11 @@ public class FlsqdServiceImpl implements IFlsqdService
             log.error("放疗单创建人不能为空");
             throw new ServiceException("放疗单创建人不能为空");
         }
+//        flsqd.setId(getNewId());
         flsqd.setCreateTime(new Date());
         String fldzt = flsqd.getFldzt();
         int r = flsqdMapper.insertFlsqd(flsqd);
+        updateNewId();
         if (fldzt.equals("jxz") && r > 0) {
             log.info("创建放疗申请单[{}]时状态为进行中，流程开启", flsqd.getId());
             lcNext(flsqd, null);
