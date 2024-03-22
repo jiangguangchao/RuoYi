@@ -13,6 +13,7 @@ import com.ruoyi.common.exception.ServiceException;
 import com.ruoyi.common.utils.DateUtils;
 import com.ruoyi.jgc.domain.Fllcjl;
 import com.ruoyi.jgc.mapper.FllcjlMapper;
+import com.ruoyi.jgc.service.IAssignWorkService;
 import com.ruoyi.system.mapper.SysPostMapper;
 import com.sun.jna.platform.win32.Winspool;
 import org.apache.commons.lang3.ArrayUtils;
@@ -48,6 +49,8 @@ public class FlsqdServiceImpl implements IFlsqdService
 
     @Autowired
     private RedisCache redisCache;
+    @Autowired
+    private IAssignWorkService assignWorkService;
 
     public static final String FLSQD_ID_CACHE_KEY = "FLSQD_ID_CACHE_KEY";
 
@@ -224,12 +227,18 @@ public class FlsqdServiceImpl implements IFlsqdService
             flsqd.setDqczry(null);//流程已结束，任务已经不属于任何人了
         } else {
             if (!StringUtils.hasText(oldJd)) {
-                log.debug("当前申请单[{}] 流程节点为空，开始将节点置为第一个流程节点，且申请单状态改为进行中");
+                log.debug("当前申请单[{}] 流程节点为空，开始将节点置为第一个流程节点，且申请单状态改为进行中", flsqd.getId());
                 flsqd.setFldzt("jxz");//状态改为进行中
             }
             String nextJd = lcArr[index + 1];
             flsqd.setDqlcjdmc(nextJd);
-            flsqd.setDqczry(getAllocateUser(nextJd));
+            List<SysUserPostVo> assignUsersByPost = assignWorkService.getAssignUsersByPost(nextJd);
+            if (CollectionUtils.isEmpty(assignUsersByPost)) {
+                log.error("当前申请单[{}] 岗位[{}]没有工作人员，无法自动分配任务", flsqd.getId(), nextJd);
+            } else {
+                flsqd.setDqczry(assignUsersByPost.get(0).getUserId());
+                assignWorkService.removeToEndAtPost(nextJd, flsqd.getDqczry());
+            }
         }
 
         updateFlsqd(flsqd);

@@ -28,6 +28,8 @@ public interface IAssignWorkService {
 
     public boolean removeUserAtPost(String postCode, Long userId);
 
+    public boolean removeToEndAtPost(String postCode, Long userId);
+
     public void userPostChange(Long userId, String postCode, String prePostCode);
 
 

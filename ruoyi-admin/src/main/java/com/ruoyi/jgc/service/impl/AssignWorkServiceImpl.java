@@ -8,6 +8,7 @@ import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.jgc.service.IAssignWorkService;
 import com.ruoyi.system.service.ISysPostService;
 import com.ruoyi.system.service.ISysUserService;
+import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -157,6 +158,28 @@ public class AssignWorkServiceImpl implements IAssignWorkService {
             redisCache.setCacheList(redisKey, collect);
         }
         log.info("用户[{}]已经从当前岗位[{}]分配任务序列中移除", userName, postCode);
+        return true;
+    }
+
+    @Override
+    public boolean removeToEndAtPost(String postCode, Long userId) {
+
+        String redisKey = FLSQD_ASSIGN_WORK_POST_ + postCode;
+        List<SysUserPostVo> cacheList = redisCache.getCacheList(redisKey);
+        int n = -1;
+        for (int i = 0; i < cacheList.size(); i++) {
+            if (userId.equals(cacheList.get(i).getUserId())) {
+                n = i;
+            }
+        }
+        if (n == -1) {
+            log.error("用户[{}]不在岗位[{}]任务分配序列中，无法移到队列末尾", userId, postCode);
+            return false;
+        }
+
+        SysUserPostVo remove = cacheList.remove(n);
+        cacheList.add(remove);
+        log.info("用户[{}]在岗位[{}]上，已被移到队列末尾", userId, postCode);
         return true;
     }
 
