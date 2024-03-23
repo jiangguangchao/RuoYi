@@ -2,16 +2,24 @@ package com.ruoyi.jgc.service;
 
 import java.util.List;
 
-public interface IAssignService<T> {
+public interface IAssignService<T, U> {
 
 
-    public List<T> getAssignList(String scopeId);
+    public List<T> getAssignList(String slotId);
 
-    public List<T> refreshAssignList(String scopeId);
+    public List<T> refreshAssignList(String slotId);
 
-    public boolean addBean(String scopeId, T t);
+    public boolean addBeanById(String slotId, U id);
 
-    public boolean removeBean(String scopeId, T t);
+    public boolean removeBeanById(String slotId, U id);
 
-    public boolean moveToEnd(String scopeId, T t);
+    public boolean moveToEndById(String slotId, U id);
+
+    public boolean addBean(String slotId, T t);
+
+    public boolean removeBean(String slotId, T t);
+
+    public boolean moveToEnd(String slotId, T t);
+
+
 }
