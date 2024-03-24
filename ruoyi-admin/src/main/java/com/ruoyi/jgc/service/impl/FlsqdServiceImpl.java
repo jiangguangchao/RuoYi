@@ -51,6 +51,8 @@ public class FlsqdServiceImpl implements IFlsqdService
     private RedisCache redisCache;
     @Autowired
     private IAssignWorkService assignWorkService;
+    @Autowired
+    private AssignUserAtPostServiceImpl assignUserAtPostService;
 
     public static final String FLSQD_ID_CACHE_KEY = "FLSQD_ID_CACHE_KEY";
 
@@ -232,12 +234,14 @@ public class FlsqdServiceImpl implements IFlsqdService
             }
             String nextJd = lcArr[index + 1];
             flsqd.setDqlcjdmc(nextJd);
-            List<SysUserPostVo> assignUsersByPost = assignWorkService.getAssignUsersByPost(nextJd);
+            // List<SysUserPostVo> assignUsersByPost = assignWorkService.getAssignUsersByPost(nextJd);
+            List<SysUserPostVo> assignUsersByPost = assignUserAtPostService.getAssignList(nextJd);
             if (CollectionUtils.isEmpty(assignUsersByPost)) {
                 log.error("当前申请单[{}] 岗位[{}]没有工作人员，无法自动分配任务", flsqd.getId(), nextJd);
             } else {
                 flsqd.setDqczry(assignUsersByPost.get(0).getUserId());
-                assignWorkService.removeToEndAtPost(nextJd, flsqd.getDqczry());
+                // assignWorkService.removeToEndAtPost(nextJd, flsqd.getDqczry());
+                assignUserAtPostService.moveToEndById(nextJd, flsqd.getDqczry());
             }
         }
 

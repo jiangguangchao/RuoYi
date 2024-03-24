@@ -1,18 +1,26 @@
 package com.ruoyi.jgc.controller;
 
+import com.alibaba.fastjson.JSON;
 import com.ruoyi.common.core.controller.BaseController;
 import com.ruoyi.common.core.domain.entity.SysUserPostVo;
 import com.ruoyi.common.core.page.TableDataInfo;
+import com.ruoyi.common.core.redis.RedisCache;
 import com.ruoyi.jgc.domain.Fllcjl;
 import com.ruoyi.jgc.service.IAssignWorkService;
+import com.ruoyi.jgc.service.impl.AssignUserAtPostServiceImpl;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -33,15 +41,14 @@ public class AssignWorkController extends BaseController {
     @Autowired
     private IAssignWorkService assignWorkService;
 
+    @Autowired
+    private AssignUserAtPostServiceImpl assignUserAtPostService;
+
 //    @PreAuthorize("@ss.hasPermi('fl:assignWork:list')")
     @GetMapping("/list")
     public List<SysUserPostVo> list(String postCode)
     {
-        log.info("查询岗位任务分配顺序入口参数 {}", postCode);
-        List<SysUserPostVo> assignUsersByPost = assignWorkService.getAssignUsersByPost(postCode);
-
-        List<String> userNames = assignUsersByPost.stream().map(u -> u.getUserName()).collect(Collectors.toList());
-        log.info("查询岗位任务分配顺序 结果 {}", userNames);
+        List<SysUserPostVo> assignUsersByPost = assignUserAtPostService.getAssignList(postCode);
         return assignUsersByPost;
     }
 
@@ -51,6 +58,5 @@ public class AssignWorkController extends BaseController {
         List<SysUserPostVo> assignUsersByPost = assignWorkService.refreshAssignUsersByPost(postCode);
         return assignUsersByPost;
     }
-
 
 }

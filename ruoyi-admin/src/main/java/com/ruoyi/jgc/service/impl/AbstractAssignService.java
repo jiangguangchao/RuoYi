@@ -1,10 +1,12 @@
 package com.ruoyi.jgc.service.impl;
 
+import com.alibaba.fastjson.JSON;
 import com.ruoyi.common.core.redis.RedisCache;
 import com.ruoyi.jgc.service.IAssignService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
@@ -30,6 +32,7 @@ public abstract class AbstractAssignService<T, U> implements IAssignService<T, U
 
     private static final Logger log = LoggerFactory.getLogger(AbstractAssignService.class);
 
+
     @Autowired
     private RedisCache redisCache;
 
@@ -40,9 +43,11 @@ public abstract class AbstractAssignService<T, U> implements IAssignService<T, U
         }
         String redisKey = FLSQD_ASSIGN_ + getType() + "_" + slotId;
         List<T> list = redisCache.getCacheList(redisKey);
-        if (list == null) {
+        if (CollectionUtils.isEmpty(list)) {
+            log.info("任务队列[{}-{}] 查询到redis中队列为null，开始执行刷新操作", getType(), slotId);
             list = refreshAssignList(slotId);
         }
+        log.info("任务队列[{}-{}] 查询到redis中队列： {}", getType(), slotId, JSON.toJSONString(list));
         return list;
     }
 
@@ -108,7 +113,7 @@ public abstract class AbstractAssignService<T, U> implements IAssignService<T, U
         if(!checkSlotAndStatus(slotId, t)) {
             return false;
         }
-        String redisKey = FLSQD_ASSIGN_ + slotId;
+        String redisKey = FLSQD_ASSIGN_ + getType() + "_" + slotId;
         List<T> list = redisCache.getCacheList(redisKey);
         if (list == null) {
             list = new ArrayList<>();
@@ -126,7 +131,7 @@ public abstract class AbstractAssignService<T, U> implements IAssignService<T, U
         if(!checkSlotId(slotId)) {
             return false;
         }
-        String redisKey = FLSQD_ASSIGN_ + slotId;
+        String redisKey = FLSQD_ASSIGN_ + getType() + "_" + slotId;
         List<T> list = redisCache.getCacheList(redisKey);
         if (list == null) {
             list = new ArrayList<>();
@@ -145,7 +150,7 @@ public abstract class AbstractAssignService<T, U> implements IAssignService<T, U
         if(!checkSlotId(slotId)) {
             return false;
         }
-        String redisKey = FLSQD_ASSIGN_ + slotId;
+        String redisKey = FLSQD_ASSIGN_ + getType() + "_" + slotId;
         List<T> list = redisCache.getCacheList(redisKey);
         if (list == null) {
             list = new ArrayList<>();
@@ -157,6 +162,18 @@ public abstract class AbstractAssignService<T, U> implements IAssignService<T, U
         list.remove(t);
         list.add(t);
         redisCache.setCacheList(redisKey, list);
+        return true;
+    }
+
+    public boolean beanChangeSlot(String preSlotId, String slotId, U id){
+        if (checkSlotId(preSlotId)) {
+            removeBeanById(preSlotId, id);
+        }
+
+        if (checkSlotId(slotId)) {
+            addBeanById(slotId, id);
+        }
+
         return true;
     }
 

@@ -2,6 +2,7 @@ package com.ruoyi.jgc.event.listener;
 
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.jgc.service.IAssignWorkService;
+import com.ruoyi.jgc.service.impl.AssignUserAtPostServiceImpl;
 import com.ruoyi.system.event.domain.UserPostEvent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
@@ -18,6 +19,8 @@ public class UserPostEventListener implements ApplicationListener<UserPostEvent>
 
     @Autowired
     private IAssignWorkService assignWorkService;
+    @Autowired
+    private AssignUserAtPostServiceImpl assignUserAtPostService;
 
     @Override
     public void onApplicationEvent(UserPostEvent event) {
@@ -27,6 +30,7 @@ public class UserPostEventListener implements ApplicationListener<UserPostEvent>
             return;
         }
 
-        assignWorkService.userPostChange(event.getUserId(), event.getPostCode(), event.getPrePostCode());
+        // assignWorkService.userPostChange(event.getUserId(), event.getPostCode(), event.getPrePostCode());
+        assignUserAtPostService.beanChangeSlot(event.getPrePostCode(), event.getPostCode(), event.getUserId());
     }
 }
