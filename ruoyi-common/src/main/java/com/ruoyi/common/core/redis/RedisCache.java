@@ -116,6 +116,8 @@ public class RedisCache
      */
     public <T> long setCacheList(final String key, final List<T> dataList)
     {
+
+        redisTemplate.delete(key);
         Long count = redisTemplate.opsForList().rightPushAll(key, dataList);
         return count == null ? 0 : count;
     }

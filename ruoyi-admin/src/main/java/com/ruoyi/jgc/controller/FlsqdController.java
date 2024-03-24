@@ -92,8 +92,10 @@ public class FlsqdController extends BaseController
     public AjaxResult add(@RequestBody Flsqd flsqd)
     {
 
-        flsqd.setId(DateUtils.dateTimeNow("yyyyMMddHHmmss"));
+        // flsqd.setId(DateUtils.dateTimeNow("yyyyMMddHHmmss"));
+        flsqd.setCreateBy(getUsername());
         logger.info("新增放疗申请单 {}", JSON.toJSONString(flsqd));
+        
         return toAjax(flsqdService.insertFlsqd(flsqd));
     }
 

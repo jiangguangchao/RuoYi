@@ -21,5 +21,7 @@ public interface IAssignService<T, U> {
 
     public boolean moveToEnd(String slotId, T t);
 
+    public boolean beanChangeSlot(String preSlotId, String slotId, U id);
+
 
 }
