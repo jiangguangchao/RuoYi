@@ -302,15 +302,30 @@ public class SysUserServiceImpl implements ISysUserService
     public int updateUser(SysUser user)
     {
         Long userId = user.getUserId();
+        List<Long> postIdsInDB = postMapper.selectPostListByUserId(userId);
+        SysPost post = postMapper.selectPostById(postIdsInDB.get(0));
+        boolean postChange = true;
+        if (user.getPostIds()[0].equals(postIdsInDB.get(0))) {
+            postChange = false;
+        }
         // 删除用户与角色关联
         userRoleMapper.deleteUserRoleByUserId(userId);
         // 新增用户与角色管理
         insertUserRole(user);
-        // 删除用户与岗位关联
-        userPostMapper.deleteUserPostByUserId(userId);
-        // 新增用户与岗位管理
-        insertUserPost(user);
-        return userMapper.updateUser(user);
+
+        if (postChange) {
+            // 删除用户与岗位关联
+            userPostMapper.deleteUserPostByUserId(userId);
+            // 新增用户与岗位管理
+            insertUserPost(user);
+        }
+
+        int updateUser = userMapper.updateUser(user);
+        if (postChange && updateUser == 1) {
+            publishUserPostEvent(user, post.getPostCode());
+        }
+        
+        return updateUser;
     }
 
     /**
@@ -480,7 +495,6 @@ public class SysUserServiceImpl implements ISysUserService
                 userPostMapper.batchUserPost(list);
             }
         }
-        publishUserStatusEvent(user);
     }
 
     /**
