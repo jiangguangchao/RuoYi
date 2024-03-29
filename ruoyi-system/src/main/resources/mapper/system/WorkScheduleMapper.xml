@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.jgc.mapper.WorkScheduleMapper">
+    
+    <resultMap type="WorkSchedule" id="WorkScheduleResult">
+        <result property="id"    column="id"    />
+        <result property="userId"    column="user_id"    />
+        <result property="schDate"    column="sch_date"    />
+        <result property="schTime"    column="sch_time"    />
+        <result property="machineId"    column="machine_id"    />
+        <result property="dbr"    column="dbr"    />
+        <result property="dbsj"    column="dbsj"    />
+    </resultMap>
+
+    <sql id="selectWorkScheduleVo">
+        select id, user_id, sch_date, sch_time, machine_id, dbr, dbsj from work_schedule
+    </sql>
+
+    <select id="selectWorkScheduleList" parameterType="WorkSchedule" resultMap="WorkScheduleResult">
+        <include refid="selectWorkScheduleVo"/>
+        <where>  
+            <if test="userId != null "> and user_id = #{userId}</if>
+            <if test="params.beginSchDate != null and params.beginSchDate != '' and params.endSchDate != null and params.endSchDate != ''"> and sch_date between #{params.beginSchDate} and #{params.endSchDate}</if>
+        </where>
+    </select>
+    
+    <select id="selectWorkScheduleById" parameterType="Long" resultMap="WorkScheduleResult">
+        <include refid="selectWorkScheduleVo"/>
+        where id = #{id}
+    </select>
+        
+    <insert id="insertWorkSchedule" parameterType="WorkSchedule" useGeneratedKeys="true" keyProperty="id">
+        insert into work_schedule
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="userId != null">user_id,</if>
+            <if test="schDate != null">sch_date,</if>
+            <if test="schTime != null">sch_time,</if>
+            <if test="machineId != null">machine_id,</if>
+            <if test="dbr != null">dbr,</if>
+            <if test="dbsj != null">dbsj,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="userId != null">#{userId},</if>
+            <if test="schDate != null">#{schDate},</if>
+            <if test="schTime != null">#{schTime},</if>
+            <if test="machineId != null">#{machineId},</if>
+            <if test="dbr != null">#{dbr},</if>
+            <if test="dbsj != null">#{dbsj},</if>
+         </trim>
+    </insert>
+
+    <update id="updateWorkSchedule" parameterType="WorkSchedule">
+        update work_schedule
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="userId != null">user_id = #{userId},</if>
+            <if test="schDate != null">sch_date = #{schDate},</if>
+            <if test="schTime != null">sch_time = #{schTime},</if>
+            <if test="machineId != null">machine_id = #{machineId},</if>
+            <if test="dbr != null">dbr = #{dbr},</if>
+            <if test="dbsj != null">dbsj = #{dbsj},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteWorkScheduleById" parameterType="Long">
+        delete from work_schedule where id = #{id}
+    </delete>
+
+    <delete id="deleteWorkScheduleByIds" parameterType="String">
+        delete from work_schedule where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>
