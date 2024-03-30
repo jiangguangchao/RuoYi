@@ -3,6 +3,8 @@ package com.ruoyi.web.controller.system;
 import java.util.List;
 import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletResponse;
+
+import com.ruoyi.common.core.domain.entity.SysUserPostVo;
 import org.apache.commons.lang3.ArrayUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -68,6 +70,13 @@ public class SysUserController extends BaseController
     {
         startPage();
         List<SysUser> list = userService.selectAllUsers();
+        return AjaxResult.success(list);
+    }
+
+    @GetMapping("/getUserByPostCode")
+    public AjaxResult getUserByPostCode(String postCode)
+    {
+        List<SysUserPostVo> list = postService.selectUserByPost(postCode);
         return AjaxResult.success(list);
     }
 

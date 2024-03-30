@@ -26,8 +26,7 @@ public class Machine extends BaseEntity
     @Excel(name = "机器名称")
     private String name;
 
-    /** 工作状态 0--不工作 1--工作中 */
-    @Excel(name = "工作状态 0--不工作 1--工作中")
+    @Excel(name = "工作状态(是否工作中) N--否 Y--是")
     private String workState;
 
     public void setId(Integer id)
