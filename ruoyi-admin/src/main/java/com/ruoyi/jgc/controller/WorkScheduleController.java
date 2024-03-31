@@ -12,6 +12,7 @@ import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletResponse;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StreamUtils;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -31,6 +32,7 @@ import com.ruoyi.common.enums.BusinessType;
 import com.ruoyi.jgc.domain.WorkSchedule;
 import com.ruoyi.jgc.service.IWorkScheduleService;
 import com.ruoyi.common.utils.DateUtils;
+import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.utils.poi.ExcelUtil;
 import com.ruoyi.common.core.page.TableDataInfo;
 
@@ -125,6 +127,11 @@ public class WorkScheduleController extends BaseController
             return AjaxResult.success();
         }
         list.forEach(w -> {
+
+            if(w.getUserId() == null || w.getMachineId() == null || StringUtils.isEmpty(w.getSchTime())) {
+                return;
+            }
+
             if (w.getId() != null) {
                 edit(w);
             } else {

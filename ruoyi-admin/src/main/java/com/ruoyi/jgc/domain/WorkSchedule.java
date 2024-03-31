@@ -24,6 +24,8 @@ public class WorkSchedule extends BaseEntity
     private Long userId;
 
     /** 值班日期 */
+    
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private Date schDate;
 
     /** 值班时间 */
