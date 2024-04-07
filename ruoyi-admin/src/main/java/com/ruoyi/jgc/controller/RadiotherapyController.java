@@ -1,5 +1,6 @@
 package com.ruoyi.jgc.controller;
 
+import java.util.Date;
 import java.util.List;
 import javax.servlet.http.HttpServletResponse;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -12,12 +13,15 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import com.alibaba.fastjson.JSON;
 import com.ruoyi.common.annotation.Log;
 import com.ruoyi.common.core.controller.BaseController;
 import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.common.enums.BusinessType;
 import com.ruoyi.jgc.domain.Radiotherapy;
 import com.ruoyi.jgc.service.IRadiotherapyService;
+import com.ruoyi.common.utils.DateUtils;
 import com.ruoyi.common.utils.poi.ExcelUtil;
 import com.ruoyi.common.core.page.TableDataInfo;
 
@@ -44,6 +48,35 @@ public class RadiotherapyController extends BaseController
         startPage();
         List<Radiotherapy> list = radiotherapyService.selectRadiotherapyList(radiotherapy);
         return getDataTable(list);
+    }
+
+    /**
+     * 查询未来一天的放射治疗列表
+     */
+    // @PreAuthorize("@ss.hasPermi('fl:radiotherapy:list')")
+    @GetMapping("/list/future")
+    public AjaxResult listFuture(Radiotherapy radiotherapy)
+    {
+        List<Radiotherapy> list = radiotherapyService.selectRadiotherapyList(radiotherapy);
+
+        //对list排序， 先按照machineId排序，相同的machineId,并且schTime不为空，则按照schTime升序排列
+        
+        list.sort((o1, o2) -> {
+            if (o1.getMachineId().equals(o2.getMachineId())) {
+                if (o1.getSchTime() != null && o2.getSchTime() != null) {
+                    return o1.getSchTime().compareTo(o2.getSchTime());
+                }
+                else {
+                    return 0;
+                }
+            } else {
+                return o1.getMachineId().compareTo(o2.getMachineId());
+            }
+        });
+
+        logger.info("排序后 {}", JSON.toJSONString(list));
+
+        return AjaxResult.success(list);
     }
 
     /**

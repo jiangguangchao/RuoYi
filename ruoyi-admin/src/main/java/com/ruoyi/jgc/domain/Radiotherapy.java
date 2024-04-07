@@ -27,15 +27,15 @@ public class Radiotherapy extends BaseEntity
 
     /** 机器编号 */
     @Excel(name = "机器编号")
-    private Long machineId;
+    private Integer machineId;
 
     /** 是否已安排治疗时间 N-否 Y-是 */
     @Excel(name = "是否已安排治疗时间 N-否 Y-是")
     private String schFlag;
 
     /** 预计治疗时间 */
-    @JsonFormat(pattern = "yyyy-MM-dd")
-    @Excel(name = "预计治疗时间", width = 30, dateFormat = "yyyy-MM-dd")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
+    @Excel(name = "预计治疗时间", width = 30, dateFormat = "yyyy-MM-dd HH:mm")
     private Date schTime;
 
     /** 是否已治疗 N-否 Y-是 */
@@ -47,8 +47,8 @@ public class Radiotherapy extends BaseEntity
     private String cureOperator;
 
     /** 治疗结束时间 */
-    @JsonFormat(pattern = "yyyy-MM-dd")
-    @Excel(name = "治疗结束时间", width = 30, dateFormat = "yyyy-MM-dd")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
+    @Excel(name = "治疗结束时间", width = 30, dateFormat = "yyyy-MM-dd HH:mm")
     private Date cureEndTime;
 
     /** 治疗状态 0--未开始 1--治疗中 5--已结束 */
@@ -73,12 +73,12 @@ public class Radiotherapy extends BaseEntity
     {
         return fldId;
     }
-    public void setMachineId(Long machineId) 
+    public void setMachineId(Integer machineId) 
     {
         this.machineId = machineId;
     }
 
-    public Long getMachineId() 
+    public Integer getMachineId() 
     {
         return machineId;
     }
