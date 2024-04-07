@@ -175,8 +175,8 @@
             <if test="dqczry != null and dqczry != ''">#{dqczry},</if>
             <if test="fldzt != null and fldzt != ''">#{fldzt},</if>
             <if test="fuid != null and fuid != ''">#{fuid},</if>
-            <if test="createBy != null and createBy != ''">{createBy},</if>
-            <if test="createTime != null">{createTime},</if>
+            <if test="createBy != null and createBy != ''">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
         </trim>
     </insert>
 
