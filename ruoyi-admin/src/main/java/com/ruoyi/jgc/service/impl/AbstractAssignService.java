@@ -6,7 +6,6 @@ import com.ruoyi.jgc.service.IAssignService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
@@ -66,7 +65,7 @@ public abstract class AbstractAssignService<T, U> implements IAssignService<T, U
         //checkedListFromDB是刚从数据库查询出来，并且排除了状态不合适的，所以这个队列中的要全部存入redis。
         //但是要注意checkedListFromDB的元素顺序仅仅是数据库查询的排列顺序，并不一定和redis中已有队列顺序一致
         //所以顺序要参照redis中队列顺序
-        List<T> checkedListFromDB = listFromDB.stream().filter(t -> checkStatus(t)).collect(Collectors.toList());
+        List<T> checkedListFromDB = listFromDB.stream().filter(t -> checkBeanStatus(t)).collect(Collectors.toList());
         if (CollectionUtils.isEmpty(checkedListFromDB)) {
             redisCache.deleteObject(redisKey);
             return null;
@@ -110,7 +109,7 @@ public abstract class AbstractAssignService<T, U> implements IAssignService<T, U
 
     @Override
     public boolean addBean(String slotId, T t) {
-        if(!checkSlotAndStatus(slotId, t)) {
+        if(!checkSlotAndBeanStatus(slotId, t)) {
             return false;
         }
         String redisKey = FLSQD_ASSIGN_ + getType() + "_" + slotId;
@@ -159,6 +158,11 @@ public abstract class AbstractAssignService<T, U> implements IAssignService<T, U
             return false;
         }
 
+        //如果list中只有当前一个bean，就没必要移动了
+        if (list.size() == 1) {
+            return true;
+        }
+
         list.remove(t);
         list.add(t);
         redisCache.setCacheList(redisKey, list);
@@ -190,7 +194,7 @@ public abstract class AbstractAssignService<T, U> implements IAssignService<T, U
 
     public abstract T getBeanById(U Id);
 
-    public boolean checkStatus(T t) {
+    public boolean checkBeanStatus(T t) {
         return true;
     }
 
@@ -198,8 +202,8 @@ public abstract class AbstractAssignService<T, U> implements IAssignService<T, U
         return true;
     }
 
-    public boolean checkSlotAndStatus(String slotId, T t) {
-        return checkSlotId(slotId) && checkStatus(t);
+    public boolean checkSlotAndBeanStatus(String slotId, T t) {
+        return checkSlotId(slotId) && checkBeanStatus(t);
     }
 
 

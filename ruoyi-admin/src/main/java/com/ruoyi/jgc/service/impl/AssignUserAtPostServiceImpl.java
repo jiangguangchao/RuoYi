@@ -56,7 +56,7 @@ public class AssignUserAtPostServiceImpl extends AbstractAssignService<SysUserPo
     }
 
     @Override
-    public boolean checkStatus(SysUserPostVo t) {
+    public boolean checkBeanStatus(SysUserPostVo t) {
         return "0".equals(t.getStatus()) && "1".equals(t.getAssignWork());
     }
 }
