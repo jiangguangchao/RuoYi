@@ -14,7 +14,10 @@ import java.util.List;
 
 /**
  * @program: ruoyi
- * @description:
+ * @description: 在指定的岗位上维护一条员工队列（每个岗位都有自己独立的队列），
+ * 用于排列当前岗位上多个员工接受任务顺序。比如放疗定位岗有 U1,U2,U3三个用户，
+ * 在队列中排列是U1,U2,U3。 U1排第一意味着下一个任务是U1先接受，当U1接受任务后，
+ * 队列就变成了U2,U3,U1
  * @author:
  * @create: 2024-03-23 15:42
  */
@@ -22,6 +25,7 @@ import java.util.List;
 @Service
 public class AssignUserAtPostServiceImpl extends AbstractAssignService<SysUserPostVo, Long>{
 
+    //指定那些岗位需要维护一个员工队列
     public static final String[] postArr = {"dw", "bqgh", "bqhz","bqtj","jhsj","jhhz","fwyz"};
 
     @Autowired
