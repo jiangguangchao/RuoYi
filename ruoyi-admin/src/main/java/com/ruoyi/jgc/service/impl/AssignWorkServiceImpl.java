@@ -37,7 +37,7 @@ public class AssignWorkServiceImpl implements IAssignWorkService {
 
     public static final String FLSQD_ASSIGN_WORK_POST_ ="FLSQD_ASSIGN_WORK_POST_";
 
-    public static final String[] postArr = {"dw", "bqgh", "bqhz","bqtj","jhsj","jhhz","fwyz"};
+    public static final String[] postArr = AssignUserAtPostServiceImpl.postArr;
 
     @Autowired
     private RedisCache redisCache;

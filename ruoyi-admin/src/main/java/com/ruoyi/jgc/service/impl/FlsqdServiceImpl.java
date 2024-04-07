@@ -56,7 +56,7 @@ public class FlsqdServiceImpl implements IFlsqdService
 
     public static final String FLSQD_ID_CACHE_KEY = "FLSQD_ID_CACHE_KEY";
 
-    public static final String[] lcArr = {"dw", "bqgh", "bqhz","bqtj","jhsj","jhhz","fwyz"};
+    public static final String[] lcArr = AssignUserAtPostServiceImpl.postArr;
 
     private static final Logger log = LoggerFactory.getLogger(FlsqdServiceImpl.class);
 
