@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.jgc.mapper.RadiotherapyMapper">
+    
+    <resultMap type="Radiotherapy" id="RadiotherapyResult">
+        <result property="id"    column="id"    />
+        <result property="fldId"    column="fld_id"    />
+        <result property="machineId"    column="machine_id"    />
+        <result property="schFlag"    column="sch_flag"    />
+        <result property="schTime"    column="sch_time"    />
+        <result property="cureFlag"    column="cure_flag"    />
+        <result property="cureOperator"    column="cure_operator"    />
+        <result property="cureEndTime"    column="cure_end_time"    />
+        <result property="cureStatus"    column="cure_status"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="updateTime"    column="update_time"    />
+    </resultMap>
+
+    <sql id="selectRadiotherapyVo">
+        select id, fld_id, machine_id, sch_flag, sch_time, cure_flag, cure_operator, cure_end_time, cure_status, create_by, create_time, update_by, update_time from radiotherapy
+    </sql>
+
+    <select id="selectRadiotherapyList" parameterType="Radiotherapy" resultMap="RadiotherapyResult">
+        <include refid="selectRadiotherapyVo"/>
+        <where>  
+            <if test="fldId != null  and fldId != ''"> and fld_id = #{fldId}</if>
+            <if test="machineId != null "> and machine_id = #{machineId}</if>
+            <if test="schFlag != null  and schFlag != ''"> and sch_flag = #{schFlag}</if>
+            <if test="cureFlag != null  and cureFlag != ''"> and cure_flag = #{cureFlag}</if>
+            <if test="cureStatus != null  and cureStatus != ''"> and cure_status = #{cureStatus}</if>
+        </where>
+    </select>
+    
+    <select id="selectRadiotherapyById" parameterType="Long" resultMap="RadiotherapyResult">
+        <include refid="selectRadiotherapyVo"/>
+        where id = #{id}
+    </select>
+        
+    <insert id="insertRadiotherapy" parameterType="Radiotherapy" useGeneratedKeys="true" keyProperty="id">
+        insert into radiotherapy
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="fldId != null">fld_id,</if>
+            <if test="machineId != null">machine_id,</if>
+            <if test="schFlag != null">sch_flag,</if>
+            <if test="schTime != null">sch_time,</if>
+            <if test="cureFlag != null">cure_flag,</if>
+            <if test="cureOperator != null">cure_operator,</if>
+            <if test="cureEndTime != null">cure_end_time,</if>
+            <if test="cureStatus != null">cure_status,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateBy != null">update_by,</if>
+            <if test="updateTime != null">update_time,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="fldId != null">#{fldId},</if>
+            <if test="machineId != null">#{machineId},</if>
+            <if test="schFlag != null">#{schFlag},</if>
+            <if test="schTime != null">#{schTime},</if>
+            <if test="cureFlag != null">#{cureFlag},</if>
+            <if test="cureOperator != null">#{cureOperator},</if>
+            <if test="cureEndTime != null">#{cureEndTime},</if>
+            <if test="cureStatus != null">#{cureStatus},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+         </trim>
+    </insert>
+
+    <update id="updateRadiotherapy" parameterType="Radiotherapy">
+        update radiotherapy
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="fldId != null">fld_id = #{fldId},</if>
+            <if test="machineId != null">machine_id = #{machineId},</if>
+            <if test="schFlag != null">sch_flag = #{schFlag},</if>
+            <if test="schTime != null">sch_time = #{schTime},</if>
+            <if test="cureFlag != null">cure_flag = #{cureFlag},</if>
+            <if test="cureOperator != null">cure_operator = #{cureOperator},</if>
+            <if test="cureEndTime != null">cure_end_time = #{cureEndTime},</if>
+            <if test="cureStatus != null">cure_status = #{cureStatus},</if>
+            <if test="createBy != null">create_by = #{createBy},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteRadiotherapyById" parameterType="Long">
+        delete from radiotherapy where id = #{id}
+    </delete>
+
+    <delete id="deleteRadiotherapyByIds" parameterType="String">
+        delete from radiotherapy where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>
