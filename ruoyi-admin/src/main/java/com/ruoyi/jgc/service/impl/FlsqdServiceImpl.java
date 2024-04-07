@@ -25,7 +25,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.ruoyi.jgc.mapper.FlsqdMapper;
 import com.ruoyi.jgc.domain.Flsqd;
+import com.ruoyi.jgc.domain.Machine;
+import com.ruoyi.jgc.domain.Radiotherapy;
 import com.ruoyi.jgc.service.IFlsqdService;
+import com.ruoyi.jgc.service.IRadiotherapyService;
+
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
@@ -53,6 +57,10 @@ public class FlsqdServiceImpl implements IFlsqdService
     private IAssignWorkService assignWorkService;
     @Autowired
     private AssignUserAtPostServiceImpl assignUserAtPostService;
+    @Autowired
+    private AssignMachinServiceImpl assignMachinService;
+    @Autowired
+    private IRadiotherapyService radiotherapyService;
 
     public static final String FLSQD_ID_CACHE_KEY = "FLSQD_ID_CACHE_KEY";
 
@@ -224,9 +232,12 @@ public class FlsqdServiceImpl implements IFlsqdService
 
 
         if ((index + 1) == lcArr.length) {
-            flsqd.setFldzt("yjs");//状态改为结束
-            flsqd.setDqlcjdmc("");//流程已结束，流节点置为空
-            flsqd.setDqczry(null);//流程已结束，任务已经不属于任何人了
+            //nothing to do
+
+            // flsqd.setFldzt("yjs");//状态改为结束
+            // flsqd.setDqlcjdmc("");//流程已结束，流节点置为空
+            // flsqd.setDqczry(null);//流程已结束，任务已经不属于任何人了
+            
         } else {
             if (!StringUtils.hasText(oldJd)) {
                 log.debug("当前申请单[{}] 流程节点为空，开始将节点置为第一个流程节点，且申请单状态改为进行中", flsqd.getId());
@@ -234,15 +245,30 @@ public class FlsqdServiceImpl implements IFlsqdService
             }
             String nextJd = lcArr[index + 1];
             flsqd.setDqlcjdmc(nextJd);
-            // List<SysUserPostVo> assignUsersByPost = assignWorkService.getAssignUsersByPost(nextJd);
-            List<SysUserPostVo> assignUsersByPost = assignUserAtPostService.getAssignList(nextJd);
-            if (CollectionUtils.isEmpty(assignUsersByPost)) {
-                log.error("当前申请单[{}] 岗位[{}]没有工作人员，无法自动分配任务", flsqd.getId(), nextJd);
+            if (nextJd.equals("fszl")) {
+                //当前节点nextJd是"fszl",表示当前节点是放射治疗节点，需要自动分配机器
+                List<Machine> assMachines = assignMachinService.getAssignList(flsqd.getZljq());
+                if (CollectionUtils.isEmpty(assMachines)) {
+                    log.warn("放疗申请单[{}]分配放疗机器[{}]时，无可用机器", flsqd.getId(), flsqd.getZljq());
+                } else {
+                    Radiotherapy radiotherapy = new Radiotherapy();
+                    radiotherapy.setFldId(flsqd.getId());
+                    radiotherapy.setMachineId(assMachines.get(0).getId());
+                    radiotherapyService.insertRadiotherapy(radiotherapy);
+                    assignMachinService.moveToEnd(flsqd.getZljq(), assMachines.get(0));
+                }
             } else {
-                flsqd.setDqczry(assignUsersByPost.get(0).getUserId());
-                // assignWorkService.removeToEndAtPost(nextJd, flsqd.getDqczry());
-                assignUserAtPostService.moveToEndById(nextJd, flsqd.getDqczry());
+                //当前节点nextJd不是"fszl",表示当前节点是放射治疗之前的某个节点，需要自动分配岗位上的人员
+                List<SysUserPostVo> assignUsersByPost = assignUserAtPostService.getAssignList(nextJd);
+                if (CollectionUtils.isEmpty(assignUsersByPost)) {
+                    log.error("当前申请单[{}] 岗位[{}]没有工作人员，无法自动分配任务", flsqd.getId(), nextJd);
+                } else {
+                    flsqd.setDqczry(assignUsersByPost.get(0).getUserId());
+                    // assignWorkService.removeToEndAtPost(nextJd, flsqd.getDqczry());
+                    assignUserAtPostService.moveToEndById(nextJd, flsqd.getDqczry());
+                }
             }
+            
         }
 
         updateFlsqd(flsqd);
