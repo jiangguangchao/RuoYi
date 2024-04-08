@@ -1,5 +1,6 @@
 package com.ruoyi.jgc.service.impl;
 
+import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Date;
 import java.util.HashMap;
@@ -7,6 +8,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import com.alibaba.fastjson.JSON;
+import com.ruoyi.common.core.domain.entity.SysUser;
 import com.ruoyi.common.core.domain.entity.SysUserPostVo;
 import com.ruoyi.common.core.redis.RedisCache;
 import com.ruoyi.common.exception.ServiceException;
@@ -204,77 +207,189 @@ public class FlsqdServiceImpl implements IFlsqdService
         return lcNext(flsqd, userId);
     }
 
+    /**
+     * 放疗申请单从当前节点转移到下一个流程节点，并且在流程记录表新增一条记录，
+     * 以便保存当前节点操作人和操作时间等信息
+     * @param flsqd
+     * @param signUerId
+     * @return
+     */
     @Override
     public boolean lcNext(Flsqd flsqd, Long signUerId) {
 
+//        //index 表示当前节点序号，-1通常是新创建的放疗单，并且还没有开启流程，
+//        //新创建的放疗单开启流程后，会自动来到第一个节点，这个时候index就是0
+//        int index = -1;
+//        if (ArrayUtils.contains(lcArr, flsqd.getDqlcjdmc())) {
+//            index = ArrayUtils.lastIndexOf(lcArr, flsqd.getDqlcjdmc());
+//        }
+//
+//        Long oldUser = flsqd.getDqczry();
+//        if (signUerId != null) {
+//            oldUser = signUerId;
+//        }
+//
+//        //新增一条流程记录
+//        if (index >= 0) {
+//            Fllcjl fllcjl = new Fllcjl();
+//            fllcjl.setCzr(flsqd.getDqczry());
+//            fllcjl.setCzsj(new Date());
+//            fllcjl.setFlid(flsqd.getId());
+//            fllcjl.setLcjdmc(flsqd.getDqlcjdmc());
+//            fllcjl.setLcjdxh(index);
+//            fllcjlMapper.insertFllcjl(fllcjl);
+//        }
+//
+//        String presentNode = flsqd.getDqlcjdmc();//当前节点
+//        String presentFldZt = flsqd.getFldzt();//当前放疗单状态
+//
+//
+//        if (index == lcArr.length - 1) {
+//            //当前节点已经是最后一个节点，最后一个节点是放射治疗节点
+//            flsqd.setFldzt("yjs");//状态改为结束
+//            flsqd.setDqlcjdmc("");//流程已结束，流节点置为空
+//            flsqd.setDqczry(null);//流程已结束，任务已经不属于任何人了
+//
+//            //因为是最后一个放射治疗节点都是双人上岗，所以这里新增流程记录的时候，按照签字人数新增流程记录
+//            //也就是说当前这个任务有几个人共同完成，就生成几条流程记录
+//
+//
+//        } else {
+//            if (!StringUtils.hasText(presentNode)) {
+//                log.debug("当前申请单[{}] 流程节点为空，开始将节点置为第一个流程节点，且申请单状态改为进行中", flsqd.getId());
+//                flsqd.setFldzt("jxz");//状态改为进行中
+//            }
+//            String nextJd = lcArr[index + 1];
+//            flsqd.setDqlcjdmc(nextJd);
+//            if (nextJd.equals("fszl")) {
+//                //当前节点nextJd是"fszl",表示当前节点是放射治疗节点，需要自动分配机器
+//                List<Machine> assMachines = assignMachinService.getAssignList(flsqd.getZljq());
+//                if (CollectionUtils.isEmpty(assMachines)) {
+//                    log.warn("放疗申请单[{}]分配放疗机器[{}]时，无可用机器", flsqd.getId(), flsqd.getZljq());
+//                } else {
+//                    Radiotherapy radiotherapy = new Radiotherapy();
+//                    radiotherapy.setFldId(flsqd.getId());
+//                    radiotherapy.setMachineId(assMachines.get(0).getId());
+//                    radiotherapyService.insertRadiotherapy(radiotherapy);
+//                    assignMachinService.moveToEnd(flsqd.getZljq(), assMachines.get(0));
+//                }
+//            } else {
+//                //当前节点nextJd不是"fszl",表示当前节点是放射治疗之前的某个节点，需要自动分配岗位上的人员
+//                List<SysUserPostVo> assignUsersByPost = assignUserAtPostService.getAssignList(nextJd);
+//                if (CollectionUtils.isEmpty(assignUsersByPost)) {
+//                    log.error("当前申请单[{}] 岗位[{}]没有工作人员，无法自动分配任务", flsqd.getId(), nextJd);
+//                } else {
+//                    flsqd.setDqczry(assignUsersByPost.get(0).getUserId());
+//                    // assignWorkService.removeToEndAtPost(nextJd, flsqd.getDqczry());
+//                    assignUserAtPostService.moveToEndById(nextJd, flsqd.getDqczry());
+//                }
+//            }
+//
+//        }
+//
+//        updateFlsqd(flsqd);
+//
+//        log.info("放疗申请单流程变化 申请单状态 [{}]->[{}], 流程节点[{}]->[{}], 所属操作人员[{}]->[{}]",
+//                presentFldZt, flsqd.getFldzt(), presentNode, flsqd.getDqlcjdmc(), oldUser, flsqd.getDqczry());
+//
+//        return true;
+
+        return lcStepNext(flsqd, signUerId);
+    }
+
+    public boolean lcStepNext(Flsqd flsqd, Long signUerId) {
+
+        if ("yjs".equals(flsqd.getFldzt())) {
+            log.warn("当前放疗单[{}]已经结束，无法到下一个流程节点", flsqd.getId());
+            return false;
+        }
+
+        log.info("开始将放疗单[{}]转移到下一个节点", JSON.toJSONString(flsqd));
+
+        //index 表示当前节点序号，-1通常是新创建的放疗单，并且还没有开启流程，
+        //新创建的放疗单开启流程后，会自动来到第一个节点，这个时候index就是0
         int index = -1;
-        if (ArrayUtils.contains(lcArr, flsqd.getDqlcjdmc())) {
+
+        //如果未开始，直接开始
+        if ("wks".equals(flsqd.getFldzt())) {
+            log.debug("当前放疗单[{}] 状态为‘未开始’，开始将节点置为第一个流程节点，且申请单状态改为进行中", flsqd.getId());
+            flsqd.setFldzt("jxz");
+        } else {
             index = ArrayUtils.lastIndexOf(lcArr, flsqd.getDqlcjdmc());
         }
 
-        Long oldUser = flsqd.getDqczry();
-        if (signUerId != null) {
-            oldUser = signUerId;
-        }
+        String presentNode = flsqd.getDqlcjdmc();//当前节点
+        String nextNode = "";
+        Long presentUser = flsqd.getDqczry();//当前节点所属的操作人
+        String presentStatus = flsqd.getFldzt();//当前放疗单状态
+        List<Fllcjl> fllcjls = new ArrayList<>();
 
-        if (index >= 0) {
-            Fllcjl fllcjl = new Fllcjl();
-            fllcjl.setCzr(flsqd.getDqczry());
-            fllcjl.setCzsj(new Date());
-            fllcjl.setFlid(flsqd.getId());
-            fllcjl.setLcjdmc(flsqd.getDqlcjdmc());
-            fllcjl.setLcjdxh(index);
-            fllcjlMapper.insertFllcjl(fllcjl);
-        }
+        if (index == lcArr.length - 1) {
+            //当前节点是放射治疗节点，也就是最后一个节点
+            log.info("当前放疗单[{}]节点是放射治疗节点，需要结束当前流程", flsqd.getId());
+            flsqd.setFldzt("yjs");//状态改为结束
+            flsqd.setDqlcjdmc("");//流程已结束，流节点置为空
+            flsqd.setDqczry(null);//流程已结束，任务已经不属于任何人了
 
-        String oldJd = flsqd.getDqlcjdmc();
-        String oldZt = flsqd.getFldzt();
-
-
-        if ((index + 1) == lcArr.length) {
-            //nothing to do
-
-            // flsqd.setFldzt("yjs");//状态改为结束
-            // flsqd.setDqlcjdmc("");//流程已结束，流节点置为空
-            // flsqd.setDqczry(null);//流程已结束，任务已经不属于任何人了
-            
-        } else {
-            if (!StringUtils.hasText(oldJd)) {
-                log.debug("当前申请单[{}] 流程节点为空，开始将节点置为第一个流程节点，且申请单状态改为进行中", flsqd.getId());
-                flsqd.setFldzt("jxz");//状态改为进行中
+            //因为是最后一个放射治疗节点必须多人上岗（一般是双人），所以这里新增流程记录的时候，按照签字人数新增流程记录
+            //也就是说当前这个任务有几个人共同完成，就生成几条流程记录
+            List<SysUser> userList = new ArrayList<>();//模拟获取当前机器当前时段的操作人员
+            for (SysUser u : userList) {
+                Fllcjl fllcjl = new Fllcjl();
+                fllcjl.setCzr(u.getUserId());
+                fllcjl.setCzsj(new Date());
+                fllcjl.setFlid(flsqd.getId());
+                fllcjl.setLcjdmc(presentNode);
+                fllcjl.setLcjdxh(index);
+                fllcjls.add(fllcjl);
             }
-            String nextJd = lcArr[index + 1];
-            flsqd.setDqlcjdmc(nextJd);
-            if (nextJd.equals("fszl")) {
-                //当前节点nextJd是"fszl",表示当前节点是放射治疗节点，需要自动分配机器
+        } else {
+            nextNode = lcArr[index + 1];
+            flsqd.setDqlcjdmc(nextNode);
+            if (index == lcArr.length - 2) {
+                //当前节点是放射治疗前的复位验证（fwyz），流转到下一步放射治疗时要分配机器，同时要生成一条放射治疗记录
+                log.info("当前放疗单[{}]节点是复位验证节点，下一节点需要分配治疗机器", flsqd.getId());
+                flsqd.setDqczry(null);
                 List<Machine> assMachines = assignMachinService.getAssignList(flsqd.getZljq());
                 if (CollectionUtils.isEmpty(assMachines)) {
-                    log.warn("放疗申请单[{}]分配放疗机器[{}]时，无可用机器", flsqd.getId(), flsqd.getZljq());
+                    log.warn("放疗单[{}]分配放疗机器[{}]时，无可用机器", flsqd.getId(), flsqd.getZljq());
                 } else {
+                    //生成一条放射治疗记录
                     Radiotherapy radiotherapy = new Radiotherapy();
                     radiotherapy.setFldId(flsqd.getId());
                     radiotherapy.setMachineId(assMachines.get(0).getId());
                     radiotherapyService.insertRadiotherapy(radiotherapy);
                     assignMachinService.moveToEnd(flsqd.getZljq(), assMachines.get(0));
                 }
+
             } else {
-                //当前节点nextJd不是"fszl",表示当前节点是放射治疗之前的某个节点，需要自动分配岗位上的人员
-                List<SysUserPostVo> assignUsersByPost = assignUserAtPostService.getAssignList(nextJd);
+                //分配操作人
+                log.info("放疗单[{}]下一节点需要分配操作人", flsqd.getId());
+                List<SysUserPostVo> assignUsersByPost = assignUserAtPostService.getAssignList(nextNode);
                 if (CollectionUtils.isEmpty(assignUsersByPost)) {
-                    log.error("当前申请单[{}] 岗位[{}]没有工作人员，无法自动分配任务", flsqd.getId(), nextJd);
+                    log.error("当前放疗单[{}] 岗位[{}]没有工作人员，无法自动分配任务", flsqd.getId(), nextNode);
                 } else {
                     flsqd.setDqczry(assignUsersByPost.get(0).getUserId());
-                    // assignWorkService.removeToEndAtPost(nextJd, flsqd.getDqczry());
-                    assignUserAtPostService.moveToEndById(nextJd, flsqd.getDqczry());
+                    assignUserAtPostService.moveToEndById(nextNode, flsqd.getDqczry());
                 }
             }
-            
+
+            Fllcjl fllcjl = new Fllcjl();
+            fllcjl.setCzr(presentUser);
+            fllcjl.setCzsj(new Date());
+            fllcjl.setFlid(flsqd.getId());
+            fllcjl.setLcjdmc(presentNode);
+            fllcjl.setLcjdxh(index);
+            fllcjls.add(fllcjl);
         }
 
+        for (Fllcjl fllcjl : fllcjls) {
+            fllcjlMapper.insertFllcjl(fllcjl);
+        }
         updateFlsqd(flsqd);
 
-        log.info("放疗申请单流程变化 申请单状态 [{}]->[{}], 流程节点[{}]->[{}], 所属操作人员[{}]->[{}]",
-                oldZt, flsqd.getFldzt(), oldJd, flsqd.getDqlcjdmc(), oldUser, flsqd.getDqczry());
+        log.info("放疗单[{}]流程变化 状态 [{}]->[{}], 流程节点[{}]->[{}], 所属操作人员[{}]->[{}]",
+                flsqd.getId(), presentStatus, flsqd.getFldzt(), presentNode, flsqd.getDqlcjdmc(), presentUser, flsqd.getDqczry());
 
         return true;
     }

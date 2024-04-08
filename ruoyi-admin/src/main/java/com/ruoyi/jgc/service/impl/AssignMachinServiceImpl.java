@@ -4,6 +4,7 @@ import com.ruoyi.common.core.domain.entity.SysUserPostVo;
 import com.ruoyi.jgc.domain.Machine;
 import com.ruoyi.jgc.service.IMachineService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 
@@ -15,6 +16,8 @@ import java.util.List;
  * @author:
  * @create: 2024-04-07 10:06
  */
+
+@Service
 public class AssignMachinServiceImpl extends AbstractAssignService<Machine, Integer>{
 
     @Autowired
