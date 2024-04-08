@@ -70,6 +70,11 @@ public class RadiotherapyServiceImpl implements IRadiotherapyService
         return radiotherapyMapper.updateRadiotherapy(radiotherapy);
     }
 
+    @Override
+    public int removeSchTime(Long id) {
+        return radiotherapyMapper.removeSchTime(id);
+    }
+
     /**
      * 批量删除放射治疗
      * 

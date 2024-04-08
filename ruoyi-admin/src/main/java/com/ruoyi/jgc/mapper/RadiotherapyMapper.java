@@ -43,6 +43,8 @@ public interface RadiotherapyMapper
      */
     public int updateRadiotherapy(Radiotherapy radiotherapy);
 
+    public int removeSchTime(Long id);
+
     /**
      * 删除放射治疗
      * 

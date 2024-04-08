@@ -309,19 +309,21 @@ public class FlsqdServiceImpl implements IFlsqdService
         //index 表示当前节点序号，-1通常是新创建的放疗单，并且还没有开启流程，
         //新创建的放疗单开启流程后，会自动来到第一个节点，这个时候index就是0
         int index = -1;
-
-        //如果未开始，直接开始
-        if ("wks".equals(flsqd.getFldzt())) {
-            log.debug("当前放疗单[{}] 状态为‘未开始’，开始将节点置为第一个流程节点，且申请单状态改为进行中", flsqd.getId());
-            flsqd.setFldzt("jxz");
-        } else {
-            index = ArrayUtils.lastIndexOf(lcArr, flsqd.getDqlcjdmc());
-        }
-
         String presentNode = flsqd.getDqlcjdmc();//当前节点
         String nextNode = "";
         Long presentUser = flsqd.getDqczry();//当前节点所属的操作人
         String presentStatus = flsqd.getFldzt();//当前放疗单状态
+
+        //如果未开始，直接开始
+        if ("wks".equals(flsqd.getFldzt())) {
+            log.info("当前放疗单[{}] 状态为‘未开始’，开始将节点置为第一个流程节点，且申请单状态改为进行中", flsqd.getId());
+            flsqd.setFldzt("jxz");
+            flsqd.setDqlcjdmc(lcArr[0]);
+        } else {
+            index = ArrayUtils.lastIndexOf(lcArr, flsqd.getDqlcjdmc());
+        }
+
+
         List<Fllcjl> fllcjls = new ArrayList<>();
 
         if (index == lcArr.length - 1) {
@@ -349,7 +351,7 @@ public class FlsqdServiceImpl implements IFlsqdService
             if (index == lcArr.length - 2) {
                 //当前节点是放射治疗前的复位验证（fwyz），流转到下一步放射治疗时要分配机器，同时要生成一条放射治疗记录
                 log.info("当前放疗单[{}]节点是复位验证节点，下一节点需要分配治疗机器", flsqd.getId());
-                flsqd.setDqczry(null);
+                flsqd.setDqczry(-1l);//-1代表空
                 List<Machine> assMachines = assignMachinService.getAssignList(flsqd.getZljq());
                 if (CollectionUtils.isEmpty(assMachines)) {
                     log.warn("放疗单[{}]分配放疗机器[{}]时，无可用机器", flsqd.getId(), flsqd.getZljq());
@@ -374,13 +376,15 @@ public class FlsqdServiceImpl implements IFlsqdService
                 }
             }
 
-            Fllcjl fllcjl = new Fllcjl();
-            fllcjl.setCzr(presentUser);
-            fllcjl.setCzsj(new Date());
-            fllcjl.setFlid(flsqd.getId());
-            fllcjl.setLcjdmc(presentNode);
-            fllcjl.setLcjdxh(index);
-            fllcjls.add(fllcjl);
+            if (index > -1) {
+                Fllcjl fllcjl = new Fllcjl();
+                fllcjl.setCzr(presentUser);
+                fllcjl.setCzsj(new Date());
+                fllcjl.setFlid(flsqd.getId());
+                fllcjl.setLcjdmc(presentNode);
+                fllcjl.setLcjdxh(index);
+                fllcjls.add(fllcjl);
+            }
         }
 
         for (Fllcjl fllcjl : fllcjls) {

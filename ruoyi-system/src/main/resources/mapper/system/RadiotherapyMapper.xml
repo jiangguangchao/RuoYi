@@ -4,7 +4,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.ruoyi.jgc.mapper.RadiotherapyMapper">
     
-    <resultMap type="Radiotherapy" id="RadiotherapyResult">
+    <resultMap type="RadiotherapyDto" id="RadiotherapyResult">
         <result property="id"    column="id"    />
         <result property="fldId"    column="fld_id"    />
         <result property="machineId"    column="machine_id"    />
@@ -18,10 +18,16 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="createTime"    column="create_time"    />
         <result property="updateBy"    column="update_by"    />
         <result property="updateTime"    column="update_time"    />
+        <result property="hzXm"    column="hz_xm"    />
+        <result property="machineName"    column="machineName"    />
     </resultMap>
 
     <sql id="selectRadiotherapyVo">
-        select id, fld_id, machine_id, sch_flag, sch_time, cure_flag, cure_operator, cure_end_time, cure_status, create_by, create_time, update_by, update_time from radiotherapy
+        select r.id, fld_id, machine_id, sch_flag, sch_time, cure_flag, cure_operator, cure_end_time, cure_status,
+            r.create_by, r.create_time, r.update_by, r.update_time ,f.hz_xm, m.name machineName
+        from radiotherapy r
+            left join flsqd f on r.fld_id = f.id
+            left join machine m on r.machine_id = m.id
     </sql>
 
     <select id="selectRadiotherapyList" parameterType="Radiotherapy" resultMap="RadiotherapyResult">
@@ -71,6 +77,11 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="updateTime != null">#{updateTime},</if>
          </trim>
     </insert>
+
+    <update id="removeSchTime" parameterType="long">
+        update radiotherapy set sch_flag = 'N', sch_time = null
+        where id = #{id}
+    </update>
 
     <update id="updateRadiotherapy" parameterType="Radiotherapy">
         update radiotherapy

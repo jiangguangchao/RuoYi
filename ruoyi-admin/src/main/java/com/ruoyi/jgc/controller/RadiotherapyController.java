@@ -47,6 +47,25 @@ public class RadiotherapyController extends BaseController
     {
         startPage();
         List<Radiotherapy> list = radiotherapyService.selectRadiotherapyList(radiotherapy);
+
+        list.sort((o1, o2) -> {
+            if (o1.getMachineId().equals(o2.getMachineId())) {
+                long time1 = o1.getSchTime() == null ? -1l : o1.getSchTime().getTime();
+                long time2 = o2.getSchTime() == null ? -1l : o2.getSchTime().getTime();
+                return (int) (time1 - time2);
+//                if (o1.getSchTime() != null && o2.getSchTime() != null) {
+//                    return o1.getSchTime().compareTo(o2.getSchTime());
+//                }
+//                else if (o1.getSchTime() == null){
+//                    return -1;
+//                } else {
+//                    return 0;
+//                }
+            } else {
+                return o1.getMachineId().compareTo(o2.getMachineId());
+            }
+        });
+
         return getDataTable(list);
     }
 
@@ -122,6 +141,17 @@ public class RadiotherapyController extends BaseController
     public AjaxResult edit(@RequestBody Radiotherapy radiotherapy)
     {
         return toAjax(radiotherapyService.updateRadiotherapy(radiotherapy));
+    }
+
+    /**
+     * 移除放射治疗时间安排
+     */
+    @PreAuthorize("@ss.hasPermi('fl:radiotherapy:edit')")
+    @Log(title = "放射治疗", businessType = BusinessType.UPDATE)
+    @PutMapping("/removeSchTime")
+    public AjaxResult removeSchTime(@RequestBody Radiotherapy radiotherapy)
+    {
+        return toAjax(radiotherapyService.removeSchTime(radiotherapy.getId()));
     }
 
     /**
