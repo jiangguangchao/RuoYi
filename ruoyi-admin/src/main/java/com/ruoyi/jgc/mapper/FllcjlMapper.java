@@ -20,7 +20,7 @@ public interface FllcjlMapper
      * @param flid 放疗流程记录主键
      * @return 放疗流程记录
      */
-    public FllcjlDto selectFllcjlByFlid(String flid);
+    public List<FllcjlDto> selectFllcjlByFlid(String flid);
 
     /**
      * 查询放疗流程记录列表

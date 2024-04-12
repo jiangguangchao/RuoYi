@@ -30,7 +30,7 @@ public class FllcjlServiceImpl implements IFllcjlService
      * @return 放疗流程记录
      */
     @Override
-    public Fllcjl selectFllcjlByFlid(String flid)
+    public List<? extends Fllcjl> selectFllcjlByFlid(String flid)
     {
         return fllcjlMapper.selectFllcjlByFlid(flid);
     }
