@@ -8,6 +8,7 @@ import com.ruoyi.common.core.domain.entity.SysUserPostVo;
 import org.apache.commons.lang3.ArrayUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.util.CollectionUtils;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
+
 import com.ruoyi.common.annotation.Log;
 import com.ruoyi.common.constant.UserConstants;
 import com.ruoyi.common.core.controller.BaseController;
@@ -124,8 +126,11 @@ public class SysUserController extends BaseController
         if (StringUtils.isNotNull(userId))
         {
             SysUser sysUser = userService.selectUserById(userId);
+            List<Long> postIds = postService.selectPostListByUserId(userId);
+            String postCode = CollectionUtils.isEmpty(postIds) ? postService.selectPostById(postIds.get(0)).getPostCode() : "";
             ajax.put(AjaxResult.DATA_TAG, sysUser);
-            ajax.put("postIds", postService.selectPostListByUserId(userId));
+            ajax.put("postIds", postIds);
+            ajax.put("postCode", postCode);
             ajax.put("roleIds", sysUser.getRoles().stream().map(SysRole::getRoleId).collect(Collectors.toList()));
         }
         return ajax;
