@@ -119,6 +119,7 @@ public class FlsqdServiceImpl implements IFlsqdService
 
     public boolean updateNewId() {
         Map<String, Object> flsqdIdMap = redisCache.getCacheMap(FLSQD_ID_CACHE_KEY);
+        log.info("更新redis中放疗单id，更新前 {}", JSON.toJSONString(flsqdIdMap));
         if (CollectionUtils.isEmpty(flsqdIdMap)) {
             flsqdIdMap = new HashMap<>();
             flsqdIdMap.put("year", DateUtils.parseDateToStr("yyyy", new Date()));
@@ -126,8 +127,8 @@ public class FlsqdServiceImpl implements IFlsqdService
         } else {
             flsqdIdMap.put("idNum", (Integer)flsqdIdMap.get("idNum") + 1);
         }
-
         redisCache.setCacheMap(FLSQD_ID_CACHE_KEY, flsqdIdMap);
+        log.info("更新redis中放疗单id，更新后 {}", JSON.toJSONString(flsqdIdMap));
         return true;
     }
 

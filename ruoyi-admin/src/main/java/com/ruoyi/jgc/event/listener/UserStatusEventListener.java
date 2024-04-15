@@ -4,6 +4,7 @@ import com.ruoyi.jgc.service.IAssignWorkService;
 import com.ruoyi.jgc.service.impl.AssignUserAtPostServiceImpl;
 import com.ruoyi.jgc.service.impl.FlsqdServiceImpl;
 import com.ruoyi.system.event.domain.UserStatusEvent;
+import com.ruoyi.system.service.ISysUserService;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -23,32 +24,26 @@ import org.springframework.stereotype.Component;
 public class UserStatusEventListener implements ApplicationListener<UserStatusEvent> {
 
     private static final Logger log = LoggerFactory.getLogger(UserStatusEventListener.class);
-    @Autowired
-    private IAssignWorkService assignWorkService;
 
     @Autowired
     private AssignUserAtPostServiceImpl assignUserAtPostService;
+    @Autowired
+    private ISysUserService sysUserService;
 
     @Override
     public void onApplicationEvent(UserStatusEvent event) {
+
+        if (sysUserService.selectUserById(event.getUserId()) == null) {
+            //用户被删除
+            log.info("用户[{}]被删除，删除前所在岗位[{}]", event.getUserId(), event.getPostCode());
+            assignUserAtPostService.removeBeanById(event.getPostCode(), event.getUserId());
+            return;
+        }
+
         log.info("用户[{}] 在岗位[{}]状态发生改变 [{} {}]", event.getUserId(), event.getPostCode(), event.getStatus(), event.getAssignWork());
-        // String postCode = event.getPostCode();
-        // Long userId = event.getUserId();
-        // if (StringUtils.isEmpty(postCode) ) {
-        //     log.info("用户状态发生变化，但用户现岗位为空，不做岗位分配序列处理");
-        //     return;
-        // }
-        // String[] posts = FlsqdServiceImpl.lcArr;
-        // if (!ArrayUtils.contains(posts, postCode)) {
-        //     log.info("用户状态发生变化，但当前用户[{}]所在岗位[{}]不属于放疗单相关岗位角色，不做岗位分配序列处理",
-        //             userId, postCode);
-        //     return;
-        // }
         if ("0".equals(event.getStatus()) && "1".equals(event.getAssignWork())) {
-            // assignWorkService.addUserAtPost(event.getPostCode(), event.getUserId());
             assignUserAtPostService.addBeanById(event.getPostCode(), event.getUserId());
         } else {
-            // assignWorkService.removeUserAtPost(event.getPostCode(), event.getUserId());
             assignUserAtPostService.removeBeanById(event.getPostCode(), event.getUserId());
         }
     }

@@ -83,6 +83,7 @@
                 and create_time &lt;= #{params.endTime}
             </if>
         </where>
+        order by create_time desc
     </select>
 
     <select id="selectFlsqdById" parameterType="String" resultMap="FlsqdResult">
