@@ -1,6 +1,7 @@
 package com.ruoyi.system.service.impl;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -12,6 +13,8 @@ import javax.validation.Validator;
 import com.ruoyi.common.enums.UserStatus;
 import com.ruoyi.system.event.domain.UserPostEvent;
 import com.ruoyi.system.event.domain.UserStatusEvent;
+
+import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -298,7 +301,7 @@ public class SysUserServiceImpl implements ISysUserService
     }
 
     /**
-     * 修改保存用户信息
+     * 修改保存用户信息，注意：这个方法不会修改用户的状态和是否接受任务状态
      * 
      * @param user 用户信息
      * @return 结果
@@ -313,21 +316,34 @@ public class SysUserServiceImpl implements ISysUserService
             post = postMapper.selectPostById(postIdsInDB.get(0));
         }
         boolean postChange = true;
-        Long postIdInDB = CollectionUtils.isEmpty(postIdsInDB) ? null : postIdsInDB.get(0);
-        Long postIdInUser = ArrayUtils.isEmpty(user.getPostIds()) ? null : user.getPostIds()[0];
-        if (postIdInDB == null && postIdInUser == null) {
+        List<Long> postIdInDB = CollectionUtils.isEmpty(postIdsInDB) ? new ArrayList<>() : postIdsInDB;
+        List<Long> postIdInUser = ArrayUtils.isEmpty(user.getPostIds()) ? new ArrayList<>() : Arrays.asList(user.getPostIds());
+        //判断postIdInDB和postIdInUser两个集合中的元素是否完全一致(元素顺序无所谓)
+        int size = postIdInDB.size();
+        postIdInDB.retainAll(postIdInUser);
+        List<String> prePostCodes = new ArrayList<>();
+        if (size == postIdInUser.size() && size == postIdInDB.size()) {
             postChange = false;
-        } else if (postIdInDB != null && postIdInUser != null && postIdInDB.equals(postIdInUser)) {
-            postChange = false;
+        } else {
+            List<SysPost> posts = postMapper.selectPostsByUserId(userId);
+            if (!CollectionUtils.isEmpty(posts)) {
+                prePostCodes = posts.stream().map(SysPost::getPostCode).collect(Collectors.toList());
+            }
         }
 
         int updateUser = doUpdateUser(user);
-
         if (postChange && updateUser == 1) {
-            String prePostCode = post == null ? null : post.getPostCode();
-            publishUserPostEvent(user, prePostCode);
+            //这里的doUpdateUser不会改变用户状态，所以这里不需要pushUserStatusEvent
+            publishUserPostEvent(user, prePostCodes);
         }
         return updateUser;
+    }
+
+    public static void main(String[] args) {
+        List<Long> list1 = new ArrayList<>();
+        List<Long> list2 = new ArrayList<>();
+        list1.retainAll(list2);
+        log.info(" {}", list1.size());
     }
 
     @Transactional
@@ -394,17 +410,31 @@ public class SysUserServiceImpl implements ISysUserService
 
     }
 
-    public void publishUserPostEvent(SysUser user, String prePostCode) {
+    // public void publishUserPostEvent(SysUser user, String prePostCode) {
 
-        String postCode = null;
+    //     String postCode = null;
+    //     SysUser sysUser = selectUserById(user.getUserId());
+    //     if ("0".equals(sysUser.getDelFlag())) {
+    //         List<SysPost> list = postMapper.selectPostsByUserName(sysUser.getUserName());
+    //         if (!CollectionUtils.isEmpty(list)) {
+    //             postCode = list.get(0).getPostCode();
+    //         }
+    //     }
+    //     eventPublisher.publishEvent(new UserPostEvent(this, sysUser.getUserId(), postCode, prePostCode));
+
+    // }
+
+    public void publishUserPostEvent(SysUser user, List<String> prePostCodes) {
+
+        List<String> postCodes = new ArrayList<>();
         SysUser sysUser = selectUserById(user.getUserId());
         if ("0".equals(sysUser.getDelFlag())) {
             List<SysPost> list = postMapper.selectPostsByUserName(sysUser.getUserName());
             if (!CollectionUtils.isEmpty(list)) {
-                postCode = list.get(0).getPostCode();
+                postCodes = list.stream().map(p -> p.getPostCode()).collect(Collectors.toList());
             }
         }
-        eventPublisher.publishEvent(new UserPostEvent(this, sysUser.getUserId(), postCode, prePostCode));
+        eventPublisher.publishEvent(new UserPostEvent(this, sysUser.getUserId(), postCodes, prePostCodes));
 
     }
 
@@ -599,8 +629,7 @@ public class SysUserServiceImpl implements ISysUserService
         }
         Map<Long, List<String>> userPostCodesMap = new HashMap<>();
         for (Long id : userIds) {
-            SysUser selectUserById = selectUserById(id);
-            List<SysPost> sysPosts = postMapper.selectPostsByUserName(selectUserById.getUserName());
+            List<SysPost> sysPosts = postMapper.selectPostsByUserId(id);
             List<String> postCodes = sysPosts == null ? new ArrayList<>() : sysPosts.stream().map(SysPost::getPostCode).collect(Collectors.toList());
             userPostCodesMap.put(id, postCodes);
         }
@@ -609,7 +638,7 @@ public class SysUserServiceImpl implements ISysUserService
             for (Long userId : userIds) {
                 SysUser u = new SysUser();
                 u.setUserId(userId);
-                publishUserPostEvent(u, userPostCodesMap.get(u.getUserId()).get(0));
+                publishUserPostEvent(u, userPostCodesMap.get(u.getUserId()));
             }
         }
         return r;

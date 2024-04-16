@@ -51,6 +51,8 @@ public interface SysPostMapper
      */
     public List<SysPost> selectPostsByUserName(String userName);
 
+    public List<SysPost> selectPostsByUserId(Long userId);
+
     /**
      * 根据岗位代码查询用户
      *

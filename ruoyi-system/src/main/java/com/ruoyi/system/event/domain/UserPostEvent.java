@@ -1,5 +1,7 @@
 package com.ruoyi.system.event.domain;
 
+import java.util.List;
+
 import org.springframework.context.ApplicationEvent;
 
 /**
@@ -17,10 +19,10 @@ public class UserPostEvent extends ApplicationEvent {
      * 如果prePostCode和postCode一致，说明岗位没有变化，如果不一致，
      * 说明岗位发生变化
      */
-    private String postCode;
-    private String prePostCode;
+    private List<String> postCode;
+    private List<String> prePostCode;
 
-    public UserPostEvent(Object source, Long userId, String postCode, String prePostCode) {
+    public UserPostEvent(Object source, Long userId, List<String> postCode, List<String> prePostCode) {
         super(source);
         this.userId = userId;
         this.postCode = postCode;
@@ -31,11 +33,11 @@ public class UserPostEvent extends ApplicationEvent {
         return userId;
     }
 
-    public String getPostCode() {
+    public List<String> getPostCode() {
         return postCode;
     }
 
-    public String getPrePostCode() {
+    public List<String> getPrePostCode() {
         return prePostCode;
     }
 }

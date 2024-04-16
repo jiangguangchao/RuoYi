@@ -99,8 +99,28 @@ public abstract class AbstractAssignService<T, U> implements IAssignService<T, U
     }
 
     @Override
+    public boolean addBeanById(List<String> slotIds, U id) {
+        if (!CollectionUtils.isEmpty(slotIds)) {
+            for (String slotId : slotIds) {
+                addBeanById(slotId, id);
+            }
+        }
+        return true;
+    }
+
+    @Override
     public boolean removeBeanById(String slotId, U id) {
         return removeBean(slotId, getBeanById(id));
+    }
+
+    @Override
+    public boolean removeBeanById(List<String> slotIds, U id) {
+        if (!CollectionUtils.isEmpty(slotIds)) {
+            for (String slotId : slotIds) {
+                removeBeanById(slotId, id);
+            }
+        }
+        return true;
     }
 
     @Override
@@ -127,6 +147,16 @@ public abstract class AbstractAssignService<T, U> implements IAssignService<T, U
     }
 
     @Override
+    public boolean addBean(List<String> slotIds, T t) {
+        if (!CollectionUtils.isEmpty(slotIds)) {
+            for (String slotId : slotIds) {
+                addBean(slotId, t);
+            }
+        }
+        return true;
+    }
+
+    @Override
     public boolean removeBean(String slotId, T t) {
         if(!checkSlotId(slotId)) {
             return false;
@@ -141,6 +171,16 @@ public abstract class AbstractAssignService<T, U> implements IAssignService<T, U
             redisCache.deleteObject(redisKey);
         } else {
             redisCache.setCacheList(redisKey, list);
+        }
+        return true;
+    }
+
+    @Override
+    public boolean removeBean(List<String> slotIds, T t) {
+        if (!CollectionUtils.isEmpty(slotIds)) {
+            for (String slotId : slotIds) {
+                removeBean(slotId, t);
+            }
         }
         return true;
     }
@@ -179,6 +219,27 @@ public abstract class AbstractAssignService<T, U> implements IAssignService<T, U
             addBeanById(slotId, id);
         }
 
+        return true;
+    }
+
+    @Override
+    public boolean beanChangeSlot(List<String> preSlotIds, List<String> slotIds, U id) {
+
+        //先找出preSlotIds和slotIds两个集合共有的元素，然后将两个集合中的共有元素都移除
+        List<String> intersection = preSlotIds.stream().filter(slotId -> slotIds.contains(slotId)).collect(Collectors.toList());
+        preSlotIds.removeAll(intersection);
+        slotIds.removeAll(intersection);
+
+        if (!CollectionUtils.isEmpty(preSlotIds)) {
+            for (String preSlotId : preSlotIds) {
+                removeBeanById(preSlotId, id);
+            }
+        }
+        if (!CollectionUtils.isEmpty(slotIds)) {
+            for (String slotId : slotIds) {
+                addBeanById(slotId, id);
+            }
+        }
         return true;
     }
 
