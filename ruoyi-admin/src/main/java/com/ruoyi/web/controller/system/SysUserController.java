@@ -127,7 +127,7 @@ public class SysUserController extends BaseController
         {
             SysUser sysUser = userService.selectUserById(userId);
             List<Long> postIds = postService.selectPostListByUserId(userId);
-            String postCode = CollectionUtils.isEmpty(postIds) ? postService.selectPostById(postIds.get(0)).getPostCode() : "";
+            String postCode = CollectionUtils.isEmpty(postIds) ?"":postService.selectPostById(postIds.get(0)).getPostCode();
             ajax.put(AjaxResult.DATA_TAG, sysUser);
             ajax.put("postIds", postIds);
             ajax.put("postCode", postCode);

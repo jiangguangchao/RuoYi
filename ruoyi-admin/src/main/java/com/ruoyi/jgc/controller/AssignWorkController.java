@@ -38,8 +38,8 @@ public class AssignWorkController extends BaseController {
 
     private static final Logger log = LoggerFactory.getLogger(AssignWorkController.class);
 
-    @Autowired
-    private IAssignWorkService assignWorkService;
+    // @Autowired
+    // private IAssignWorkService assignWorkService;
 
     @Autowired
     private AssignUserAtPostServiceImpl assignUserAtPostService;
@@ -55,7 +55,10 @@ public class AssignWorkController extends BaseController {
     @GetMapping("/refresh")
     public List<SysUserPostVo> refresh(String postCode)
     {
-        List<SysUserPostVo> assignUsersByPost = assignWorkService.refreshAssignUsersByPost(postCode);
+        List<SysUserPostVo> assignUsersByPost = assignUserAtPostService.refreshAssignList(postCode);
+        log.info("刷新后：{}", JSON.toJSONString(assignUsersByPost));
+        List<SysUserPostVo> assignList = assignUserAtPostService.getAssignList(postCode);
+        log.info("刷新后通过get查询：{}", JSON.toJSONString(assignList));
         return assignUsersByPost;
     }
 

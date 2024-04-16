@@ -6,12 +6,17 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.BoundSetOperations;
 import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Component;
+
+import com.alibaba.fastjson.JSON;
 
 /**
  * spring redis 工具类
@@ -22,6 +27,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class RedisCache
 {
+    private static final Logger logger = LoggerFactory.getLogger(RedisCache.class);
+
     @Autowired
     public RedisTemplate redisTemplate;
 
@@ -117,8 +124,22 @@ public class RedisCache
     public <T> long setCacheList(final String key, final List<T> dataList)
     {
 
-        redisTemplate.delete(key);
+        Boolean delete = redisTemplate.delete(key);
+        if (delete) {
+            logger.info("删除缓存成功：{} ", key);
+        } else {
+            logger.info("删除缓存失败：{} ", key);
+        }
         Long count = redisTemplate.opsForList().rightPushAll(key, dataList);
+        try {
+            Thread.sleep(100);
+        } catch (InterruptedException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        logger.info("缓存List数据成功：key -> [{}]  size -> [{}], dataList {}", key, count, JSON.toJSONString(dataList));
+        List<Object> cacheList = getCacheList(key);
+        logger.info("缓存List数据成功：key -> [{}]  size -> [{}], dataList {}", key, cacheList.size(), JSON.toJSONString(cacheList));
         return count == null ? 0 : count;
     }
 

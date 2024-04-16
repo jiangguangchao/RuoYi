@@ -1,5 +1,7 @@
 package com.ruoyi.jgc.event.listener;
 
+import com.alibaba.fastjson.JSON;
+import com.ruoyi.common.core.domain.entity.SysUser;
 import com.ruoyi.jgc.service.IAssignWorkService;
 import com.ruoyi.jgc.service.impl.AssignUserAtPostServiceImpl;
 import com.ruoyi.jgc.service.impl.FlsqdServiceImpl;
@@ -33,7 +35,9 @@ public class UserStatusEventListener implements ApplicationListener<UserStatusEv
     @Override
     public void onApplicationEvent(UserStatusEvent event) {
 
-        if (sysUserService.selectUserById(event.getUserId()) == null) {
+        SysUser user = sysUserService.selectUserById(event.getUserId());
+        log.info("查询到用户 {}", JSON.toJSONString(user));
+        if ("2".equals(user.getDelFlag())) {
             //用户被删除
             log.info("用户[{}]被删除，删除前所在岗位[{}]", event.getUserId(), event.getPostCode());
             assignUserAtPostService.removeBeanById(event.getPostCode(), event.getUserId());

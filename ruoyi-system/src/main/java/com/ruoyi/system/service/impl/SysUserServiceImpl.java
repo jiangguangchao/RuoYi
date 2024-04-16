@@ -1,8 +1,12 @@
 package com.ruoyi.system.service.impl;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
+
+import javax.print.attribute.HashAttributeSet;
 import javax.validation.Validator;
 
 import com.ruoyi.common.enums.UserStatus;
@@ -16,6 +20,8 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
+
+import com.alibaba.fastjson.JSON;
 import com.ruoyi.common.annotation.DataScope;
 import com.ruoyi.common.constant.UserConstants;
 import com.ruoyi.common.core.domain.entity.SysRole;
@@ -298,32 +304,48 @@ public class SysUserServiceImpl implements ISysUserService
      * @return 结果
      */
     @Override
-    @Transactional
     public int updateUser(SysUser user)
     {
         Long userId = user.getUserId();
         List<Long> postIdsInDB = postMapper.selectPostListByUserId(userId);
-        SysPost post = postMapper.selectPostById(postIdsInDB.get(0));
+        SysPost post = null;
+        if (postIdsInDB.size() > 0) {
+            post = postMapper.selectPostById(postIdsInDB.get(0));
+        }
         boolean postChange = true;
-        if (user.getPostIds()[0].equals(postIdsInDB.get(0))) {
+        Long postIdInDB = CollectionUtils.isEmpty(postIdsInDB) ? null : postIdsInDB.get(0);
+        Long postIdInUser = ArrayUtils.isEmpty(user.getPostIds()) ? null : user.getPostIds()[0];
+        if (postIdInDB == null && postIdInUser == null) {
+            postChange = false;
+        } else if (postIdInDB != null && postIdInUser != null && postIdInDB.equals(postIdInUser)) {
             postChange = false;
         }
+
+        int updateUser = doUpdateUser(user);
+
+        if (postChange && updateUser == 1) {
+            String prePostCode = post == null ? null : post.getPostCode();
+            publishUserPostEvent(user, prePostCode);
+        }
+        return updateUser;
+    }
+
+    @Transactional
+    public int doUpdateUser(SysUser user) {
+        Long userId = user.getUserId();
+
         // 删除用户与角色关联
         userRoleMapper.deleteUserRoleByUserId(userId);
         // 新增用户与角色管理
         insertUserRole(user);
 
-        if (postChange) {
-            // 删除用户与岗位关联
-            userPostMapper.deleteUserPostByUserId(userId);
-            // 新增用户与岗位管理
-            insertUserPost(user);
-        }
-
+        // 删除用户与岗位关联
+        userPostMapper.deleteUserPostByUserId(userId);
+        // 新增用户与岗位管理
+        insertUserPost(user);
+        
         int updateUser = userMapper.updateUser(user);
-        if (postChange && updateUser == 1) {
-            publishUserPostEvent(user, post.getPostCode());
-        }
+        
         
         return updateUser;
     }
@@ -376,11 +398,12 @@ public class SysUserServiceImpl implements ISysUserService
 
         String postCode = null;
         SysUser sysUser = selectUserById(user.getUserId());
-        List<SysPost> list = postMapper.selectPostsByUserName(sysUser.getUserName());
-        if (!CollectionUtils.isEmpty(list)) {
-            postCode = list.get(0).getPostCode();
+        if ("0".equals(sysUser.getDelFlag())) {
+            List<SysPost> list = postMapper.selectPostsByUserName(sysUser.getUserName());
+            if (!CollectionUtils.isEmpty(list)) {
+                postCode = list.get(0).getPostCode();
+            }
         }
-
         eventPublisher.publishEvent(new UserPostEvent(this, sysUser.getUserId(), postCode, prePostCode));
 
     }
@@ -530,23 +553,35 @@ public class SysUserServiceImpl implements ISysUserService
      * @return 结果
      */
     @Override
-    @Transactional
     public int deleteUserById(Long userId)
     {
-        String prePostCode = null;
-        List<Long> longs = postMapper.selectPostListByUserId(userId);
-        if (!CollectionUtils.isEmpty(longs)) {
-            prePostCode = postMapper.selectPostById(longs.get(0)).getPostCode();
-        }
+        // String prePostCode = null;
+        // List<Long> longs = postMapper.selectPostListByUserId(userId);
+        // if (!CollectionUtils.isEmpty(longs)) {
+        //     prePostCode = postMapper.selectPostById(longs.get(0)).getPostCode();
+        // }
+        
+        // int r = doDeleteUserById(userId);
+        // if (r == 1) {
+        //     log.info("删除用户 {}", JSON.toJSONString(userId));
+        //     SysUser selectUserById = selectUserById(userId);
+        //     log.info("删除用户后 查询到用户 {}", JSON.toJSONString(selectUserById));
+        // }
+        // if (r == 1 && prePostCode != null) {
+        //     SysUser u = new SysUser(userId);
+        //     publishUserStatusEvent(u);
+        // }
+
+        return deleteUserByIds(ArrayUtils.add(ArrayUtils.EMPTY_LONG_OBJECT_ARRAY, userId));
+    }
+
+    @Transactional
+    public int doDeleteUserById(Long userId) {
         // 删除用户与角色关联
         userRoleMapper.deleteUserRoleByUserId(userId);
         // 删除用户与岗位表
         userPostMapper.deleteUserPostByUserId(userId);
         int r = userMapper.deleteUserById(userId);
-        if (r == 1 && prePostCode != null) {
-            SysUser u = new SysUser(userId);
-            publishUserStatusEvent(u);
-        }
         return r;
     }
 
@@ -557,8 +592,31 @@ public class SysUserServiceImpl implements ISysUserService
      * @return 结果
      */
     @Override
-    @Transactional
     public int deleteUserByIds(Long[] userIds)
+    {
+        if (ArrayUtils.isEmpty(userIds)) {
+            return 0;
+        }
+        Map<Long, List<String>> userPostCodesMap = new HashMap<>();
+        for (Long id : userIds) {
+            SysUser selectUserById = selectUserById(id);
+            List<SysPost> sysPosts = postMapper.selectPostsByUserName(selectUserById.getUserName());
+            List<String> postCodes = sysPosts == null ? new ArrayList<>() : sysPosts.stream().map(SysPost::getPostCode).collect(Collectors.toList());
+            userPostCodesMap.put(id, postCodes);
+        }
+        int r = doDeleteUserByIds(userIds);
+        if (r > 0) {
+            for (Long userId : userIds) {
+                SysUser u = new SysUser();
+                u.setUserId(userId);
+                publishUserPostEvent(u, userPostCodesMap.get(u.getUserId()).get(0));
+            }
+        }
+        return r;
+    }
+
+    @Transactional
+    public int doDeleteUserByIds(Long[] userIds)
     {
         for (Long userId : userIds)
         {
@@ -568,11 +626,6 @@ public class SysUserServiceImpl implements ISysUserService
         userRoleMapper.deleteUserRole(userIds);
         // 删除用户与岗位关联
         userPostMapper.deleteUserPost(userIds);
-        for (Long userId : userIds) {
-            SysUser u = new SysUser();
-            u.setUserId(userId);
-            publishUserStatusEvent(u);
-        }
         return userMapper.deleteUserByIds(userIds);
     }
 

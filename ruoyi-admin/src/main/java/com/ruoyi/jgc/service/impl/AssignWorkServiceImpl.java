@@ -1,5 +1,6 @@
 package com.ruoyi.jgc.service.impl;
 
+import com.alibaba.fastjson.JSON;
 import com.ruoyi.common.core.domain.entity.SysUser;
 import com.ruoyi.common.core.domain.entity.SysUserPostVo;
 import com.ruoyi.common.core.redis.RedisCache;
@@ -97,6 +98,8 @@ public class AssignWorkServiceImpl implements IAssignWorkService {
             redisCache.deleteObject(redisKey);
         } else {
             redisCache.setCacheList(redisKey, collect);
+            List<SysUserPostVo> list = redisCache.getCacheList(redisKey);
+            log.info("setCacheList后查询 {}", JSON.toJSONString(list));
         }
         return collect;
     }
