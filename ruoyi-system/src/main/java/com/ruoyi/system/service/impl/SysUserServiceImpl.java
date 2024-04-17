@@ -400,13 +400,14 @@ public class SysUserServiceImpl implements ISysUserService
 
         String postCode = null;
         SysUser sysUser = selectUserById(user.getUserId());
+        List<String> postCodes = new ArrayList<>();
         List<SysPost> list = postMapper.selectPostsByUserName(sysUser.getUserName());
         if (!CollectionUtils.isEmpty(list)) {
-            postCode = list.get(0).getPostCode();
+            postCodes = list.stream().map(SysPost::getPostCode).collect(Collectors.toList());
         }
 
         eventPublisher.publishEvent(new UserStatusEvent(this, sysUser.getUserId(), sysUser.getStatus(),
-                sysUser.getAssignWork(), postCode));
+                sysUser.getAssignWork(), postCodes));
 
     }
 
@@ -426,6 +427,7 @@ public class SysUserServiceImpl implements ISysUserService
 
     public void publishUserPostEvent(SysUser user, List<String> prePostCodes) {
 
+        log.info("publishUserPostEvent--- {}", JSON.toJSONString(user));
         List<String> postCodes = new ArrayList<>();
         SysUser sysUser = selectUserById(user.getUserId());
         if ("0".equals(sysUser.getDelFlag())) {
@@ -532,6 +534,7 @@ public class SysUserServiceImpl implements ISysUserService
     public void insertUserPost(SysUser user)
     {
         Long[] posts = user.getPostIds();
+        log.info("insertUserPost----- size {}  {}", posts.length, posts);
         if (StringUtils.isNotNull(posts))
         {
             // 新增用户与岗位管理

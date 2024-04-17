@@ -39,12 +39,12 @@ public class UserStatusEventListener implements ApplicationListener<UserStatusEv
         log.info("查询到用户 {}", JSON.toJSONString(user));
         if ("2".equals(user.getDelFlag())) {
             //用户被删除
-            log.info("用户[{}]被删除，删除前所在岗位[{}]", event.getUserId(), event.getPostCode());
+            log.info("用户[{}]被删除，删除前所在岗位[{}]", event.getUserId(), JSON.toJSONString(event.getPostCode()));
             assignUserAtPostService.removeBeanById(event.getPostCode(), event.getUserId());
             return;
         }
 
-        log.info("用户[{}] 在岗位[{}]状态发生改变 [{} {}]", event.getUserId(), event.getPostCode(), event.getStatus(), event.getAssignWork());
+        log.info("用户[{}] 在岗位[{}]状态发生改变 [{} {}]", event.getUserId(), JSON.toJSONString(event.getPostCode()), event.getStatus(), event.getAssignWork());
         if ("0".equals(event.getStatus()) && "1".equals(event.getAssignWork())) {
             assignUserAtPostService.addBeanById(event.getPostCode(), event.getUserId());
         } else {
