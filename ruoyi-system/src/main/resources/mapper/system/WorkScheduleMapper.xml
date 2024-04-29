@@ -12,10 +12,11 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="machineId"    column="machine_id"    />
         <result property="dbr"    column="dbr"    />
         <result property="dbsj"    column="dbsj"    />
+        <result property="textInput"    column="text_input"    />
     </resultMap>
 
     <sql id="selectWorkScheduleVo">
-        select id, user_id, sch_date, sch_time, machine_id, dbr, dbsj from work_schedule
+        select id, user_id, sch_date, sch_time, machine_id, dbr, dbsj, text_input from work_schedule
     </sql>
 
     <select id="selectWorkScheduleList" parameterType="WorkSchedule" resultMap="WorkScheduleResult">
@@ -48,6 +49,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="machineId != null">machine_id,</if>
             <if test="dbr != null">dbr,</if>
             <if test="dbsj != null">dbsj,</if>
+            <if test="textInput != null">text_input,</if>
          </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="userId != null">#{userId},</if>
@@ -56,6 +58,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="machineId != null">#{machineId},</if>
             <if test="dbr != null">#{dbr},</if>
             <if test="dbsj != null">#{dbsj},</if>
+            <if test="textInput != null">#{textInput},</if>
          </trim>
     </insert>
 
@@ -68,6 +71,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="machineId != null">machine_id = #{machineId},</if>
             <if test="dbr != null">dbr = #{dbr},</if>
             <if test="dbsj != null">dbsj = #{dbsj},</if>
+            <if test="textInput != null">text_input = #{textInput},</if>
         </trim>
         where id = #{id}
     </update>

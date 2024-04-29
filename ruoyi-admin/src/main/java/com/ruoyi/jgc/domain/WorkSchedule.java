@@ -11,7 +11,7 @@ import com.ruoyi.common.core.domain.BaseEntity;
  * 排班对象 work_schedule
  * 
  * @author ruoyi
- * @date 2024-03-29
+ * @date 2024-04-29
  */
 public class WorkSchedule extends BaseEntity
 {
@@ -24,8 +24,6 @@ public class WorkSchedule extends BaseEntity
     private Long userId;
 
     /** 值班日期 */
-    
-    @JsonFormat(pattern = "yyyy-MM-dd")
     private Date schDate;
 
     /** 值班时间 */
@@ -39,6 +37,10 @@ public class WorkSchedule extends BaseEntity
 
     /** 顶班时间 */
     private String dbsj;
+
+    /** 用户输入内容 一般是周六可能需要手动填一些内容，而不是选择机器 */
+    @Excel(name = "用户输入内容")
+    private String textInput;
 
     public void setId(Long id) 
     {
@@ -103,6 +105,15 @@ public class WorkSchedule extends BaseEntity
     {
         return dbsj;
     }
+    public void setTextInput(String textInput) 
+    {
+        this.textInput = textInput;
+    }
+
+    public String getTextInput() 
+    {
+        return textInput;
+    }
 
     @Override
     public String toString() {
@@ -114,6 +125,7 @@ public class WorkSchedule extends BaseEntity
             .append("machineId", getMachineId())
             .append("dbr", getDbr())
             .append("dbsj", getDbsj())
+            .append("textInput", getTextInput())
             .toString();
     }
 }
