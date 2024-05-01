@@ -11,7 +11,7 @@ import com.ruoyi.common.core.domain.BaseEntity;
  * 放疗申请单对象 flsqd
  *
  * @author jgc
- * @date 2023-10-31
+ * @date 2024-05-01
  */
 public class Flsqd extends BaseEntity
 {
@@ -173,6 +173,18 @@ public class Flsqd extends BaseEntity
     /** 初始放疗单 */
     @Excel(name = "初始放疗单")
     private String fuid;
+
+    /** 总放疗次数 */
+    @Excel(name = "总放疗次数")
+    private Long cureCount;
+
+    /** 已完成放疗次数 */
+    @Excel(name = "已完成放疗次数")
+    private Long curedCount;
+
+    /** 已支付治疗次数 */
+    @Excel(name = "已支付治疗次数")
+    private Long paidCount;
 
     public void setId(String id)
     {
@@ -525,6 +537,33 @@ public class Flsqd extends BaseEntity
     {
         return fuid;
     }
+    public void setCureCount(Long cureCount)
+    {
+        this.cureCount = cureCount;
+    }
+
+    public Long getCureCount()
+    {
+        return cureCount;
+    }
+    public void setCuredCount(Long curedCount)
+    {
+        this.curedCount = curedCount;
+    }
+
+    public Long getCuredCount()
+    {
+        return curedCount;
+    }
+    public void setPaidCount(Long paidCount)
+    {
+        this.paidCount = paidCount;
+    }
+
+    public Long getPaidCount()
+    {
+        return paidCount;
+    }
 
     @Override
     public String toString() {
@@ -568,6 +607,13 @@ public class Flsqd extends BaseEntity
                 .append("dqczry", getDqczry())
                 .append("fldzt", getFldzt())
                 .append("fuid", getFuid())
+                .append("createBy", getCreateBy())
+                .append("createTime", getCreateTime())
+                .append("updateBy", getUpdateBy())
+                .append("updateTime", getUpdateTime())
+                .append("cureCount", getCureCount())
+                .append("curedCount", getCuredCount())
+                .append("paidCount", getPaidCount())
                 .toString();
     }
 }

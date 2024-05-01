@@ -44,16 +44,17 @@
         <result property="dqczry"    column="dqczry"    />
         <result property="fldzt"    column="fldzt"    />
         <result property="fuid"    column="fuid"    />
-        <result property="createBy"     column="create_by"    />
-        <result property="createTime"   column="create_time"  />
-        <result property="updateBy"     column="update_by"    />
-        <result property="updateTime"   column="update_time"  />
+        <result property="createBy"    column="create_by"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="updateTime"    column="update_time"    />
+        <result property="cureCount"    column="cure_count"    />
+        <result property="curedCount"    column="cured_count"    />
+        <result property="paidCount"    column="paid_count"    />
     </resultMap>
 
     <sql id="selectFlsqdVo">
-        select id, hz_xm, hz_xb, hz_sr, hz_dh, hz_zyh, hz_ks, hz_bfys, hz_flys, hz_tbhl, hz_bs, gdfs, smsj, smzx,
-        smxj, ch, smlx1, smlx2, kf, hes, bn, qsbj, bolus, khp, qit, txrhlx, txrhbh, cdw, zljs, zljq, igrt, igrtpllx,
-        igrtplz, hxmk, jlyz, dqlcjdmc, dqczry, fldzt, fuid,create_by, create_time  from flsqd
+        select id, hz_xm, hz_xb, hz_sr, hz_dh, hz_zyh, hz_ks, hz_bfys, hz_flys, hz_tbhl, hz_bs, gdfs, smsj, smzx, smxj, ch, smlx1, smlx2, kf, hes, bn, qsbj, bolus, khp, qit, txrhlx, txrhbh, cdw, zljs, zljq, igrt, igrtpllx, igrtplz, hxmk, jlyz, dqlcjdmc, dqczry, fldzt, fuid, create_by, create_time, update_by, update_time, cure_count, cured_count, paid_count from flsqd
     </sql>
 
     <select id="selectFlsqdList" parameterType="Flsqd" resultMap="FlsqdResult">
@@ -133,8 +134,13 @@
             <if test="dqczry != null and dqczry != ''">dqczry,</if>
             <if test="fldzt != null and fldzt != ''">fldzt,</if>
             <if test="fuid != null and fuid != ''">fuid,</if>
-            <if test="createBy != null and createBy != ''">create_by,</if>
-            <if test="createTime != null">create_Time,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateBy != null">update_by,</if>
+            <if test="updateTime != null">update_time,</if>
+            <if test="cureCount != null">cure_count,</if>
+            <if test="curedCount != null">cured_count,</if>
+            <if test="paidCount != null">paid_count,</if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="id != null">#{id},</if>
@@ -176,8 +182,13 @@
             <if test="dqczry != null and dqczry != ''">#{dqczry},</if>
             <if test="fldzt != null and fldzt != ''">#{fldzt},</if>
             <if test="fuid != null and fuid != ''">#{fuid},</if>
-            <if test="createBy != null and createBy != ''">#{createBy},</if>
+            <if test="createBy != null">#{createBy},</if>
             <if test="createTime != null">#{createTime},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+            <if test="cureCount != null">#{cureCount},</if>
+            <if test="curedCount != null">#{curedCount},</if>
+            <if test="paidCount != null">#{paidCount},</if>
         </trim>
     </insert>
 
@@ -222,6 +233,11 @@
             <if test="dqczry != null and dqczry != ''">dqczry = #{dqczry},</if>
             <if test="fldzt != null and fldzt != ''">fldzt = #{fldzt},</if>
             <if test="fuid != null and fuid != ''">fuid = #{fuid},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+            <if test="cureCount != null">cure_count = #{cureCount},</if>
+            <if test="curedCount != null">cured_count = #{curedCount},</if>
+            <if test="paidCount != null">paid_count = #{paidCount},</if>
         </trim>
         where id = #{id}
     </update>
