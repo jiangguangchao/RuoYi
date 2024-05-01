@@ -79,12 +79,29 @@ public class WorkScheduleController extends BaseController
         List<Map<String, Object>> resultList = new ArrayList<>();
         userMap.forEach((k, v) -> {
             v.sort(Comparator.comparingLong(w-> w.getSchDate().getTime()));
+            WorkSchedule ws = new WorkSchedule();
             while (v.size()<7) {
-                v.add(new WorkSchedule());
+                v.add(ws);
             }
+            v.forEach(w-> {
+                if (w.getDbr() != null && w.getDbr().equals(-1l)) {
+                    w.setDbr(null);
+                    w.setDbsj(null);
+                }
+                if (StringUtils.isEmpty(w.getTextInput()) || "-1".equals(w.getTextInput())) {
+                    w.setTextInput(null);
+                }
+                if (w.getMachineId() != null && w.getMachineId().equals(-1l)) {
+                    w.setMachineId(null);
+                }
+            });
             Map<String, Object> map = new HashMap<>();
             map.put("userId", k);
             map.put("arr", v);
+            map.put("tb", v.get(0).getTb());
+            long count = v.stream().filter(w -> w.getDbr() != null ).count();
+            map.put("db", count < 1 ? "0" : "1");
+//            map.put("tb", count < 1 ? "1" : "0");
             resultList.add(map);
         });
         return AjaxResult.success(resultList);
@@ -128,9 +145,27 @@ public class WorkScheduleController extends BaseController
         }
         list.forEach(w -> {
 
-            if(w.getUserId() == null || w.getMachineId() == null || StringUtils.isEmpty(w.getSchTime())) {
+            if (w.getDbr() == null) {
+                w.setDbr(-1l);
+                w.setDbsj("-1");
+            }
+            if (StringUtils.isEmpty(w.getTextInput())) {
+                w.setTextInput("-1");
+            } else {
+                w.setMachineId(-1l);
+            }
+
+            if (w.getMachineId() == null && StringUtils.isEmpty(w.getTextInput())) {
                 return;
             }
+
+            if(w.getUserId() == null || StringUtils.isEmpty(w.getSchTime())) {
+                return;
+            }
+
+//            if (w.getMachineId() == null) {
+//                w.setMachineId(-1l);
+//            }
 
             if (w.getId() != null) {
                 edit(w);

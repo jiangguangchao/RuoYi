@@ -24,6 +24,7 @@ public class WorkSchedule extends BaseEntity
     private Long userId;
 
     /** 值班日期 */
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private Date schDate;
 
     /** 值班时间 */
@@ -41,6 +42,8 @@ public class WorkSchedule extends BaseEntity
     /** 用户输入内容 一般是周六可能需要手动填一些内容，而不是选择机器 */
     @Excel(name = "用户输入内容")
     private String textInput;
+
+    private String tb;
 
     public void setId(Long id) 
     {
@@ -113,6 +116,14 @@ public class WorkSchedule extends BaseEntity
     public String getTextInput() 
     {
         return textInput;
+    }
+
+    public String getTb() {
+        return tb;
+    }
+
+    public void setTb(String tb) {
+        this.tb = tb;
     }
 
     @Override
