@@ -186,6 +186,8 @@ public class Flsqd extends BaseEntity
     @Excel(name = "已支付治疗次数")
     private Long paidCount;
 
+    private String cureStatus;
+
     public void setId(String id)
     {
         this.id = id;
@@ -563,6 +565,14 @@ public class Flsqd extends BaseEntity
     public Long getPaidCount()
     {
         return paidCount;
+    }
+
+    public String getCureStatus() {
+        return cureStatus;
+    }
+
+    public void setCureStatus(String cureStatus) {
+        this.cureStatus = cureStatus;
     }
 
     @Override
