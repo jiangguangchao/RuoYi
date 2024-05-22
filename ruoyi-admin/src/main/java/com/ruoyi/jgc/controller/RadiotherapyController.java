@@ -3,6 +3,9 @@ package com.ruoyi.jgc.controller;
 import java.util.Date;
 import java.util.List;
 import javax.servlet.http.HttpServletResponse;
+
+import com.ruoyi.jgc.domain.Flsqd;
+import com.ruoyi.jgc.service.IFlsqdService;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -37,6 +40,8 @@ public class RadiotherapyController extends BaseController
 {
     @Autowired
     private IRadiotherapyService radiotherapyService;
+    @Autowired
+    private IFlsqdService flsqdService;
 
     /**
      * 查询放射治疗列表
@@ -119,6 +124,16 @@ public class RadiotherapyController extends BaseController
     public AjaxResult getInfo(@PathVariable("id") Long id)
     {
         return AjaxResult.success(radiotherapyService.selectRadiotherapyById(id));
+    }
+
+    /**
+     * 查询放疗单
+     */
+    @PreAuthorize("@ss.hasPermi('fl:radiotherapy:add')")
+    @GetMapping(value = "/fld")
+    public AjaxResult getFld(Flsqd flsqd)
+    {
+        return AjaxResult.success(flsqdService.selectFlsqdList(flsqd));
     }
 
     /**
