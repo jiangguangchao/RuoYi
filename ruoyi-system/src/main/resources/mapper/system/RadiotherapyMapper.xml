@@ -38,6 +38,10 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="schFlag != null  and schFlag != ''"> and sch_flag = #{schFlag}</if>
             <if test="cureFlag != null  and cureFlag != ''"> and cure_flag = #{cureFlag}</if>
             <if test="cureStatus != null  and cureStatus != ''"> and cure_status = #{cureStatus}</if>
+            <if test="params.beginTime != null  and params.beginTime != '' and params.endTime != null  and params.endTime != ''" >
+                and sch_time between #{params.beginTime} and #{params.endTime}
+            </if>
+
         </where>
     </select>
     
