@@ -358,12 +358,10 @@ public class FlsqdServiceImpl implements IFlsqdService
                 if (CollectionUtils.isEmpty(assMachines)) {
                     log.warn("放疗单[{}]分配放疗机器[{}]时，无可用机器", flsqd.getId(), flsqd.getZljq());
                 } else {
-                    //生成一条放射治疗记录
-                    Radiotherapy radiotherapy = new Radiotherapy();
-                    radiotherapy.setFldId(flsqd.getId());
-                    radiotherapy.setMachineId(assMachines.get(0).getId());
-                    radiotherapyService.insertRadiotherapy(radiotherapy);
+                    
+                    flsqd.setMachineId(assMachines.get(0).getId());
                     assignMachinService.moveToEnd(flsqd.getZljq(), assMachines.get(0));
+
                 }
 
             } else {

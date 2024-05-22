@@ -134,8 +134,8 @@ public class Flsqd extends BaseEntity
     @Excel(name = "治疗技术")
     private String zljs;
 
-    /** 治疗机器 */
-    @Excel(name = "治疗机器")
+    /** 治疗机器种类 */
+    @Excel(name = "治疗机器种类")
     private String zljq;
 
     /** IGRT */
@@ -186,7 +186,11 @@ public class Flsqd extends BaseEntity
     @Excel(name = "已支付治疗次数")
     private Long paidCount;
 
+    /** 疗程状态 */
     private String cureStatus;
+
+    /** 放疗机ID */
+    private Integer machineId;
 
     public void setId(String id)
     {
@@ -573,6 +577,13 @@ public class Flsqd extends BaseEntity
 
     public void setCureStatus(String cureStatus) {
         this.cureStatus = cureStatus;
+    }
+
+    public void setMachineId(Integer machineId) {
+        this.machineId = machineId;
+    }
+    public Integer getMachineId() {
+        return machineId;
     }
 
     @Override

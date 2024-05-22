@@ -1,12 +1,12 @@
 package com.ruoyi.jgc.service.impl;
 
-import com.ruoyi.common.core.domain.entity.SysUserPostVo;
-import com.ruoyi.jgc.domain.Machine;
-import com.ruoyi.jgc.service.IMachineService;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
+import com.ruoyi.jgc.domain.Machine;
+import com.ruoyi.jgc.service.IMachineService;
 
 /**
  * @program: ruoyi

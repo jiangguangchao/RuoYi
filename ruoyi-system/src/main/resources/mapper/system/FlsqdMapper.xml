@@ -52,13 +52,14 @@
         <result property="curedCount"    column="cured_count"    />
         <result property="paidCount"    column="paid_count"    />
         <result property="cureStatus"    column="cure_status"    />
+        <result property="machineId"    column="machine_id"    />
     </resultMap>
 
     <sql id="selectFlsqdVo">
         select id, hz_xm, hz_xb, hz_sr, hz_dh, hz_zyh, hz_ks, hz_bfys, hz_flys, hz_tbhl, hz_bs, gdfs, smsj,
         smzx, smxj, ch, smlx1, smlx2, kf, hes, bn, qsbj, bolus, khp, qit, txrhlx, txrhbh, cdw, zljs, zljq,
         igrt, igrtpllx, igrtplz, hxmk, jlyz, dqlcjdmc, dqczry, fldzt, fuid, create_by, create_time, update_by,
-        update_time, cure_count, cured_count, paid_count, cure_status from flsqd
+        update_time, cure_count, cured_count, paid_count, cure_status, machine_id from flsqd
     </sql>
 
     <select id="selectFlsqdList" parameterType="Flsqd" resultMap="FlsqdResult">
@@ -78,6 +79,7 @@
             <if test="dqczry != null  and dqczry != ''"> and dqczry = #{dqczry}</if>
             <if test="fldzt != null  and fldzt != ''"> and fldzt = #{fldzt}</if>
             <if test="cureStatus != null  and cureStatus != ''"> and cure_status = #{cureStatus}</if>
+            <if test="machineId != null  and machineId != ''"> and machine_id = #{machineId}</if>
 <!--            <if test="params.beginTime != null and params.beginTime != ''">&lt;!&ndash; 开始时间检索 &ndash;&gt;-->
 <!--                AND date_format(u.create_time,'%y%m%d') &gt;= date_format(#{params.beginTime},'%y%m%d')-->
 <!--            </if>-->
@@ -147,6 +149,7 @@
             <if test="curedCount != null">cured_count,</if>
             <if test="paidCount != null">paid_count,</if>
             <if test="cureStatus != null">cure_status,</if>
+            <if test="machineId != null">machine_id,</if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="id != null">#{id},</if>
@@ -196,6 +199,7 @@
             <if test="curedCount != null">#{curedCount},</if>
             <if test="paidCount != null">#{paidCount},</if>
             <if test="cureStatus != null">#{cureStatus},</if>
+            <if test="machineId != null">#{machineId},</if>
         </trim>
     </insert>
 
@@ -246,6 +250,7 @@
             <if test="curedCount != null">cured_count = #{curedCount},</if>
             <if test="paidCount != null">paid_count = #{paidCount},</if>
             <if test="cureStatus != null">cure_status = #{cureStatus},</if>
+            <if test="machineId != null">machine_id = #{machineId},</if>
         </trim>
         where id = #{id}
     </update>
