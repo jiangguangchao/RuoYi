@@ -147,7 +147,7 @@ public class FlsqdServiceImpl implements IFlsqdService
         }
 //        flsqd.setId(getNewId());
         flsqd.setCreateTime(new Date());
-        flsqd.setCureStatus("wks");//新增的放疗单的疗程状态是“未开始”
+        flsqd.setTreatStatus("wks");//新增的放疗单的疗程状态是“未开始”
         String fldzt = flsqd.getFldzt();
         int r = flsqdMapper.insertFlsqd(flsqd);
         updateNewId();
