@@ -35,6 +35,8 @@ public interface IRadiotherapyService
      */
     public int insertRadiotherapy(Radiotherapy radiotherapy);
 
+    public int batchInsert(List<Radiotherapy> list);
+
     /**
      * 修改放射治疗
      * 

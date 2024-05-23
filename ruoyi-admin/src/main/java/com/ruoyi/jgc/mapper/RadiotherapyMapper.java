@@ -34,6 +34,9 @@ public interface RadiotherapyMapper
      * @return 结果
      */
     public int insertRadiotherapy(Radiotherapy radiotherapy);
+    public int batchInsert(List<Radiotherapy> list);
+
+
 
     /**
      * 修改放射治疗

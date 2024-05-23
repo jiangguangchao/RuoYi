@@ -57,6 +57,11 @@ public class RadiotherapyServiceImpl implements IRadiotherapyService
         return radiotherapyMapper.insertRadiotherapy(radiotherapy);
     }
 
+    @Override
+    public int batchInsert(List<Radiotherapy> list) {
+        return radiotherapyMapper.batchInsert(list);
+    }
+
     /**
      * 修改放射治疗
      * 

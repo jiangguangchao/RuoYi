@@ -20,11 +20,14 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="updateTime"    column="update_time"    />
         <result property="hzXm"    column="hz_xm"    />
         <result property="machineName"    column="machineName"    />
+        <result property="treatStatus"    column="treat_status"    />
+        <result property="cureCount"    column="cure_count"    />
+        <result property="curedCount"    column="cured_count"    />
     </resultMap>
 
     <sql id="selectRadiotherapyVo">
-        select r.id, fld_id, r.machine_id, sch_flag, sch_time, cure_flag, cure_operator, cure_end_time, r.cure_status,
-            r.create_by, r.create_time, r.update_by, r.update_time ,f.hz_xm, m.name machineName
+        select r.id, fld_id, r.machine_id, sch_flag, sch_time, cure_flag, cure_operator, cure_end_time, r.cure_status,f.treat_status
+            r.create_by, r.create_time, r.update_by, r.update_time ,f.hz_xm, f.cure_count, f.cured_count, m.name machineName
         from radiotherapy r
             left join flsqd f on r.fld_id = f.id
             left join machine m on r.machine_id = m.id
@@ -80,6 +83,15 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="updateBy != null">#{updateBy},</if>
             <if test="updateTime != null">#{updateTime},</if>
          </trim>
+    </insert>
+
+    <insert id="batchInsert">
+        insert into radiotherapy(fld_id, machine_id, sch_flag, sch_time, cure_flag,
+            cure_status, create_by, create_time) values
+        <foreach item="item" index="index" collection="list" separator=",">
+            (#{item.fldId},#{item.machineId},#{item.schFlag},#{item.schTime},
+            #{item.cureFlag},#{item.cureStatus},#{item.createBy},#{item.createTime})
+        </foreach>
     </insert>
 
     <update id="removeSchTime" parameterType="long">

@@ -1,11 +1,17 @@
 package com.ruoyi.jgc.controller;
 
+import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import javax.servlet.http.HttpServletResponse;
 
+import com.ruoyi.common.utils.DateUtils;
 import com.ruoyi.jgc.domain.Flsqd;
+import com.ruoyi.jgc.domain.RadiotherapyDto;
 import com.ruoyi.jgc.service.IFlsqdService;
+import org.apache.poi.ss.usermodel.DateUtil;
+import org.springframework.beans.BeanUtils;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -24,7 +30,6 @@ import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.common.enums.BusinessType;
 import com.ruoyi.jgc.domain.Radiotherapy;
 import com.ruoyi.jgc.service.IRadiotherapyService;
-import com.ruoyi.common.utils.DateUtils;
 import com.ruoyi.common.utils.poi.ExcelUtil;
 import com.ruoyi.common.core.page.TableDataInfo;
 
@@ -58,14 +63,6 @@ public class RadiotherapyController extends BaseController
                 long time1 = o1.getSchTime() == null ? -1l : o1.getSchTime().getTime();
                 long time2 = o2.getSchTime() == null ? -1l : o2.getSchTime().getTime();
                 return (int) (time1 - time2);
-//                if (o1.getSchTime() != null && o2.getSchTime() != null) {
-//                    return o1.getSchTime().compareTo(o2.getSchTime());
-//                }
-//                else if (o1.getSchTime() == null){
-//                    return -1;
-//                } else {
-//                    return 0;
-//                }
             } else {
                 return o1.getMachineId().compareTo(o2.getMachineId());
             }
@@ -142,9 +139,46 @@ public class RadiotherapyController extends BaseController
     @PreAuthorize("@ss.hasPermi('fl:radiotherapy:add')")
     @Log(title = "放射治疗", businessType = BusinessType.INSERT)
     @PostMapping
-    public AjaxResult add(@RequestBody Radiotherapy radiotherapy)
+    public AjaxResult add(@RequestBody RadiotherapyDto radiotherapy)
     {
-        return toAjax(radiotherapyService.insertRadiotherapy(radiotherapy));
+        if ("wks".equals(radiotherapy.getTreatStatus())) {
+            //如果整个疗程的状态是“未开始”,则这里新增多个Radiotherapy对象，每个对象代表疗程中的一次治疗
+            logger.info("当前疗程状态未开始，开始批量新增整个疗程治疗");
+            Integer cureCount = radiotherapy.getCureCount();
+            if (cureCount == null || cureCount < 1) {
+                logger.info("批量新增整个疗程治疗时，总治疗次数不合规（不存在或者小于1）  {}", JSON.toJSONString(radiotherapy));
+            } else {
+                int stepDays = 0;
+                List<Radiotherapy> list = new ArrayList<>();
+                for (int i = 0; i < cureCount; i++) {
+                    Radiotherapy r = new Radiotherapy();
+                    BeanUtils.copyProperties(radiotherapy, r);
+                    Date date = DateUtils.addDays(radiotherapy.getSchTime(), stepDays);
+                    if (i > 0 && i < cureCount-1) {
+                        //如果中间的某一天在周六或者周日，调整到下周一
+                        int i1 = DateUtils.toCalendar(date).get(Calendar.DAY_OF_WEEK);
+                        if (i1 == 7) {
+                            //周六
+                            stepDays = stepDays + 2;
+                        }
+                        date = DateUtils.addDays(radiotherapy.getSchTime(), stepDays);
+                    }
+                    r.setSchTime(date);
+                    r.setCureFlag("N");
+                    r.setCureStatus("0");
+                    r.setCreateBy(getUsername());
+                    r.setCreateTime(new Date());
+                    list.add(r);
+
+                }
+
+                logger.info("批量新增{}个治疗对象", list.size());
+                radiotherapyService.batchInsert(list);
+            }
+        } else {
+            radiotherapyService.insertRadiotherapy(radiotherapy);
+        }
+        return AjaxResult.success();
     }
 
     /**

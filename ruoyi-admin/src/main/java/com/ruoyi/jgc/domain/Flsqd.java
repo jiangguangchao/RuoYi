@@ -187,7 +187,7 @@ public class Flsqd extends BaseEntity
     private Long paidCount;
 
     /** 疗程状态 */
-    private String cureStatus;
+    private String treatStatus;
 
     /** 放疗机ID */
     private Integer machineId;
@@ -571,12 +571,12 @@ public class Flsqd extends BaseEntity
         return paidCount;
     }
 
-    public String getCureStatus() {
-        return cureStatus;
+    public String getTreatStatus() {
+        return treatStatus;
     }
 
-    public void setCureStatus(String cureStatus) {
-        this.cureStatus = cureStatus;
+    public void setTreatStatus(String treatStatus) {
+        this.treatStatus = treatStatus;
     }
 
     public void setMachineId(Integer machineId) {
