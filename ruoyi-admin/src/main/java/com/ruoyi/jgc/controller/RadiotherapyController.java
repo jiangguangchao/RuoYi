@@ -1,15 +1,20 @@
 package com.ruoyi.jgc.controller;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import javax.servlet.http.HttpServletResponse;
 
 import com.ruoyi.common.utils.DateUtils;
 import com.ruoyi.jgc.domain.Flsqd;
 import com.ruoyi.jgc.domain.RadiotherapyDto;
 import com.ruoyi.jgc.service.IFlsqdService;
+import org.apache.commons.lang3.time.DateFormatUtils;
 import org.apache.poi.ss.usermodel.DateUtil;
 import org.springframework.beans.BeanUtils;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -201,6 +206,51 @@ public class RadiotherapyController extends BaseController
     }
 
     /**
+     * 修改放射治疗时间安排
+     */
+//    @PreAuthorize("@ss.hasPermi('fl:radiotherapy:edit')")
+    @Log(title = "放射治疗", businessType = BusinessType.UPDATE)
+    @PutMapping("/updateSchTime")
+    public AjaxResult updateSchTime(@RequestBody Map<String, Object> map)
+    {
+        logger.info("修改时间 {}", JSON.toJSONString(map));
+        Date d = new Date();
+        d.setTime((long) map.get("schTime"));
+        String updateAll = (String) map.get("updateAll");
+        Long id = (Long) map.get("id");
+
+        List<Radiotherapy> updateList = new ArrayList<>();
+        if ("1".equals(updateAll)) {
+            logger.info("将时间应用到所有放射治疗");
+            Radiotherapy query = new Radiotherapy();
+            query.setFldId((String) map.get("fldId"));
+            query.setCureStatus("0");//未治疗
+            List<Radiotherapy> list = radiotherapyService.selectRadiotherapyList(query);
+            logger.info("查询到{}条未治疗记录  {}", list.size(), map.get("schTime").getClass().getName());
+            Integer HH = Integer.valueOf(DateUtils.parseDateToStr("HH", d));
+
+            for (Radiotherapy r : list) {
+                if (r.getId().equals(id)) {
+                    r.setSchTime(d);
+                } else {
+                    r.setSchTime(DateUtils.setHours(r.getSchTime(), HH));
+                }
+                updateList.add(r);
+
+            }
+        } else {
+            Radiotherapy r = new Radiotherapy();
+            r.setId(id);
+            r.setSchTime(d);
+            updateList.add(r);
+        }
+        for (Radiotherapy r : updateList) {
+            radiotherapyService.updateRadiotherapy(r);
+        }
+        return AjaxResult.success();
+    }
+
+    /**
      * 移除放射治疗时间安排
      */
     @PreAuthorize("@ss.hasPermi('fl:radiotherapy:edit')")
@@ -220,5 +270,15 @@ public class RadiotherapyController extends BaseController
     public AjaxResult remove(@PathVariable Long[] ids)
     {
         return toAjax(radiotherapyService.deleteRadiotherapyByIds(ids));
+    }
+
+    public static void main(String[] args) throws ParseException {
+        String str = "2024-05-20T01:00:00Z";
+        Date date = DateUtils.parseDate(str, "yyyy-MM-dd'T'HH:mm:ssZ");
+        String s = DateUtils.parseDateToStr("yyyy-MM-dd HH:mm:ss", date);
+        System.out.println(s);
+
+        DateFormat.getInstance();
+
     }
 }
