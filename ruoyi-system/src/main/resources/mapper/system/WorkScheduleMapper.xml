@@ -4,7 +4,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.ruoyi.jgc.mapper.WorkScheduleMapper">
     
-    <resultMap type="WorkSchedule" id="WorkScheduleResult">
+    <resultMap type="WorkScheduleDto" id="WorkScheduleResult">
         <result property="id"    column="id"    />
         <result property="userId"    column="user_id"    />
         <result property="schDate"    column="sch_date"    />
@@ -14,10 +14,12 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="dbsj"    column="dbsj"    />
         <result property="textInput"    column="text_input"    />
         <result property="tb"    column="tb"    />
+        <result property="userName"    column="user_name"    />
     </resultMap>
 
     <sql id="selectWorkScheduleVo">
-        select id, user_id, sch_date, sch_time, machine_id, dbr, dbsj, text_input, tb from work_schedule
+        select w.id, w.user_id, sch_date, sch_time, machine_id, dbr, dbsj, text_input, tb, u.user_name from work_schedule w
+        left join sys_user u on u.user_id = w.user_id
     </sql>
 
     <select id="selectWorkScheduleList" parameterType="WorkSchedule" resultMap="WorkScheduleResult">

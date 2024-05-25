@@ -8,17 +8,22 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletResponse;
 
 import com.ruoyi.common.utils.DateUtils;
+import com.ruoyi.jgc.domain.Fllcjl;
 import com.ruoyi.jgc.domain.Flsqd;
 import com.ruoyi.jgc.domain.RadiotherapyDto;
+import com.ruoyi.jgc.service.IFllcjlService;
 import com.ruoyi.jgc.service.IFlsqdService;
+import org.apache.commons.lang3.RandomUtils;
 import org.apache.commons.lang3.time.DateFormatUtils;
 import org.apache.poi.ss.usermodel.DateUtil;
 import org.springframework.beans.BeanUtils;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -53,6 +58,8 @@ public class RadiotherapyController extends BaseController
     private IRadiotherapyService radiotherapyService;
     @Autowired
     private IFlsqdService flsqdService;
+    @Autowired
+    private IFllcjlService fllcjlService;
 
     /**
      * 查询放射治疗列表
@@ -190,6 +197,14 @@ public class RadiotherapyController extends BaseController
                 radiotherapyService.insertRadiotherapy(radiotherapy);
             }
         }
+        Flsqd flsqd = flsqdService.selectFlsqdById(radiotherapys.get(0).getFldId());
+        if ("wks".equals(flsqd.getTreatStatus())) {
+            Flsqd update = new Flsqd();
+            update.setId(flsqd.getId());
+            update.setTreatStatus("jxz");
+            flsqdService.updateFlsqd(update);
+            logger.info("放疗单[{}] 已安排了治疗时间，疗程状态由“未开始”改为“进行中” ", flsqd.getId());
+        }
 
         return AjaxResult.success();
     }
@@ -217,7 +232,7 @@ public class RadiotherapyController extends BaseController
         Date d = new Date();
         d.setTime((long) map.get("schTime"));
         String updateAll = (String) map.get("updateAll");
-        Long id = (Long) map.get("id");
+        Integer id = (Integer) map.get("id");
 
         List<Radiotherapy> updateList = new ArrayList<>();
         if ("1".equals(updateAll)) {
@@ -240,13 +255,80 @@ public class RadiotherapyController extends BaseController
             }
         } else {
             Radiotherapy r = new Radiotherapy();
-            r.setId(id);
+            r.setId(Long.valueOf(id));
             r.setSchTime(d);
             updateList.add(r);
         }
         for (Radiotherapy r : updateList) {
             radiotherapyService.updateRadiotherapy(r);
         }
+        return AjaxResult.success();
+    }
+
+    @PreAuthorize("@ss.hasPermi('fl:radiotherapy:edit')")
+    @Log(title = "放射治疗", businessType = BusinessType.UPDATE)
+    @PutMapping("/endCure")
+    @Transactional
+    public AjaxResult endCure(@RequestBody Map<String, Object> map)
+    {
+        logger.info("结束治疗操作 入口参数 {}", JSON.toJSONString(map));
+        String fldId = (String) map.get("fldId");
+        Long id = Long.valueOf(map.get("id").toString());
+        //查询fldId下的所有状态为为治疗的 放射诊疗
+        Radiotherapy query = new Radiotherapy();
+        query.setFldId(fldId);
+        List<Radiotherapy> list = radiotherapyService.selectRadiotherapyList(query);
+        List<Radiotherapy> noEndList = list.stream().filter(r -> !r.getCureStatus().equals("5")).collect(Collectors.toList());//未结束的治疗
+
+
+        boolean lastFlag = false;
+        if(noEndList.size() == 1) {
+            if (!noEndList.get(0).getId().equals(id)) {
+                logger.error("系统异常，数据库最后一次未治疗id[{}]和传入id[{}]不匹配",
+                        JSON.toJSONString(noEndList.get(0)), JSON.toJSONString(map));
+                throw new RuntimeException("数据库最后一次未治疗id和传入id不匹配");
+            }
+            //是最后一次治疗，需要将放疗单疗程状态改为‘结束’
+            lastFlag = true;
+        } else if (noEndList.size() < 1) {
+            logger.error("系统异常，数据库记录中不存在状态为未治疗的记录（可能全部治疗已经结束）",
+                    JSON.toJSONString(noEndList.get(0)), JSON.toJSONString(map));
+            throw new RuntimeException("数据库记录中不存在状态为未治疗的记录（可能全部治疗已经结束）");
+        }
+
+        Radiotherapy r = new Radiotherapy();
+        r.setId(id);
+        r.setCureStatus("5");//结束
+        r.setCureEndTime(new Date());
+        r.setUpdateBy(getUsername());
+        r.setCureFlag("Y");
+        r.setRemark((String)map.get("remark"));
+        r.setCureOperator((String)map.get("operatorNames"));
+        radiotherapyService.updateRadiotherapy(r);
+
+        List<Integer> opertaor = (List<Integer>) map.get("opertaorIds");
+        if (!CollectionUtils.isEmpty(opertaor)) {
+            for (Integer i : opertaor) {
+                Fllcjl jl = new Fllcjl();
+                jl.setLcjdmc("fzsl");
+                jl.setFlid(fldId);
+                jl.setCzsj(r.getCureEndTime());
+                jl.setCzr(Long.valueOf(i));
+                jl.setCreateBy(getUsername());
+                jl.setCreateTime(new Date());
+                jl.setLcjdxh(-1);//-1标识空
+                fllcjlService.insertFllcjl(jl);
+            }
+        }
+
+        Flsqd flsqd = new Flsqd();
+        flsqd.setId(fldId);
+        flsqd.setCuredCount(list.stream().filter(rad->rad.getCureStatus().equals("5")).count() + 1);
+        if (lastFlag) {
+            flsqd.setTreatStatus("yjs");//结束整个疗程
+        }
+        flsqdService.updateFlsqd(flsqd);
+
         return AjaxResult.success();
     }
 
