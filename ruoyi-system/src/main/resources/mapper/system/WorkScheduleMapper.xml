@@ -26,12 +26,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <include refid="selectWorkScheduleVo"/>
         <where>  
             <if test="userId != null "> and user_id = #{userId}</if>
-            <!-- <if test="params.beginTime != null and params.beginTime != ''">
-                AND date_format(sch_date,'%y%m%d') &gt;= date_format(#{params.beginTime},'%y%m%d')
-            </if>
-            <if test="params.endTime != null and params.endTime != ''">
-                AND date_format(sch_date,'%y%m%d') &lt;= date_format(#{params.endTime},'%y%m%d')
-            </if> -->
+            <if test="machineId != null "> and machine_id = #{machineId}</if>
             <if test="params.beginTime != null and params.beginTime != '' and params.endTime != null and params.endTime != ''">
                and sch_date between #{params.beginTime} and #{params.endTime}
             </if>

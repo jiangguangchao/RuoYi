@@ -31,6 +31,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         from radiotherapy r
             left join flsqd f on r.fld_id = f.id
             left join machine m on r.machine_id = m.id
+        
     </sql>
 
     <select id="selectRadiotherapyList" parameterType="Radiotherapy" resultMap="RadiotherapyResult">
@@ -44,13 +45,14 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="params.beginTime != null  and params.beginTime != '' and params.endTime != null  and params.endTime != ''" >
                 and sch_time between #{params.beginTime} and #{params.endTime}
             </if>
+            order by sch_time
 
         </where>
     </select>
     
     <select id="selectRadiotherapyById" parameterType="Long" resultMap="RadiotherapyResult">
         <include refid="selectRadiotherapyVo"/>
-        where id = #{id}
+        where r.id = #{id}
     </select>
         
     <insert id="insertRadiotherapy" parameterType="Radiotherapy" useGeneratedKeys="true" keyProperty="id">

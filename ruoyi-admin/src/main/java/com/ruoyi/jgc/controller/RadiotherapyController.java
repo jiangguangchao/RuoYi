@@ -230,7 +230,7 @@ public class RadiotherapyController extends BaseController
     {
         logger.info("修改时间 {}", JSON.toJSONString(map));
         Date d = new Date();
-        d.setTime((long) map.get("schTime"));
+        d.setTime(Long.valueOf((String)map.get("schTime")));
         String updateAll = (String) map.get("updateAll");
         Integer id = (Integer) map.get("id");
 
