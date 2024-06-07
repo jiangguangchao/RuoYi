@@ -55,6 +55,12 @@ public class Radiotherapy extends BaseEntity
     @Excel(name = "治疗状态 0--未开始 1--治疗中 5--已结束")
     private String cureStatus;
 
+    private Double x;
+    private Double y;
+    private Double z;
+    private Double rotation;
+    private Integer cureIndex;
+
     public void setId(Long id) 
     {
         this.id = id;
@@ -135,6 +141,46 @@ public class Radiotherapy extends BaseEntity
     public String getCureStatus() 
     {
         return cureStatus;
+    }
+
+    public Double getRotation() {
+        return rotation;
+    }
+
+    public void setRotation(Double rotation) {
+        this.rotation = rotation;
+    }
+
+    public Integer getCureIndex() {
+        return cureIndex;
+    }
+
+    public void setCureIndex(Integer cureIndex) {
+        this.cureIndex = cureIndex;
+    }
+
+    public Double getX() {
+        return x;
+    }
+
+    public void setX(Double x) {
+        this.x = x;
+    }
+
+    public Double getY() {
+        return y;
+    }
+
+    public void setY(Double y) {
+        this.y = y;
+    }
+
+    public Double getZ() {
+        return z;
+    }
+
+    public void setZ(Double z) {
+        this.z = z;
     }
 
     @Override

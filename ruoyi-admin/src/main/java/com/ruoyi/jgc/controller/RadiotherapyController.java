@@ -5,6 +5,7 @@ import java.text.ParseException;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -71,15 +72,33 @@ public class RadiotherapyController extends BaseController
         startPage();
         List<Radiotherapy> list = radiotherapyService.selectRadiotherapyList(radiotherapy);
 
-        list.sort((o1, o2) -> {
-            if (o1.getMachineId().equals(o2.getMachineId())) {
-                long time1 = o1.getSchTime() == null ? -1l : o1.getSchTime().getTime();
-                long time2 = o2.getSchTime() == null ? -1l : o2.getSchTime().getTime();
-                return (int) (time1 - time2);
-            } else {
-                return o1.getMachineId().compareTo(o2.getMachineId());
-            }
-        });
+//        list.sort((o1, o2) -> {
+//            if (o1.getMachineId().equals(o2.getMachineId())) {
+//                long time1 = o1.getSchTime() == null ? -1l : o1.getSchTime().getTime();
+//                long time2 = o2.getSchTime() == null ? -1l : o2.getSchTime().getTime();
+//                return (int) (time1 - time2);
+//            } else {
+//                return o1.getMachineId().compareTo(o2.getMachineId());
+//            }
+//        });
+
+        //临时计算治疗在整个疗程中的序号，以便前端显示。治疗状态是已结束[5]的已经有序号了，未治疗和治疗中的没有序号
+//        if (!CollectionUtils.isEmpty(list)) {
+//            Map<String, List<Radiotherapy>> map = list.stream().collect(Collectors.groupingBy(Radiotherapy::getFldId));
+//            map.forEach((k,v)-> {
+//                v.sort(Comparator.comparingLong(r-> r.getSchTime().getTime()));//时间排序
+//                int count = (int) v.stream().filter(r -> r.getCureStatus().equals("5")).count();//已治疗次数
+//
+//                //未治疗的在已治疗次数上依次加1，表示对应治疗的序号
+//                for (Radiotherapy rad : v) {
+//                    if (rad.getCureStatus().equals("5")) {
+//                        continue;
+//                    }
+//                    rad.setCureIndex(++count);
+//                }
+//            });
+//
+//        }
 
         return getDataTable(list);
     }
@@ -296,6 +315,7 @@ public class RadiotherapyController extends BaseController
             throw new RuntimeException("数据库记录中不存在状态为未治疗的记录（可能全部治疗已经结束）");
         }
 
+        long curedCount = list.stream().filter(rad -> rad.getCureStatus().equals("5")).count();
         Radiotherapy r = new Radiotherapy();
         r.setId(id);
         r.setCureStatus("5");//结束
@@ -304,6 +324,11 @@ public class RadiotherapyController extends BaseController
         r.setCureFlag("Y");
         r.setRemark((String)map.get("remark"));
         r.setCureOperator((String)map.get("operatorNames"));
+        r.setCureIndex((int)curedCount + 1);//治疗序号
+        r.setX(Double.valueOf(map.get("X").toString()));
+        r.setY(Double.valueOf(map.get("Y").toString()));
+        r.setZ(Double.valueOf(map.get("Z").toString()));
+        r.setRotation(Double.valueOf(map.get("rotation").toString()));
         radiotherapyService.updateRadiotherapy(r);
 
         List<Integer> opertaor = (List<Integer>) map.get("opertaorIds");
@@ -323,7 +348,7 @@ public class RadiotherapyController extends BaseController
 
         Flsqd flsqd = new Flsqd();
         flsqd.setId(fldId);
-        flsqd.setCuredCount(list.stream().filter(rad->rad.getCureStatus().equals("5")).count() + 1);
+        flsqd.setCuredCount(curedCount + 1);
         if (lastFlag) {
             flsqd.setTreatStatus("yjs");//结束整个疗程
         }
