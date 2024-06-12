@@ -33,7 +33,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     <sql id="selectRadiotherapyVo">
         select r.id, fld_id, r.machine_id, sch_flag, sch_time, cure_flag, cure_operator, cure_end_time,
             r.cure_status,f.treat_status,r.create_by, r.create_time, r.update_by, r.update_time ,
-            r.x, r.y, r.z, r.rotation, r.cure_index, f.hz_xm, f.cure_count, f.cured_count, m.name machineName
+            r.x, r.y, r.z, r.rotation, r.cure_index, r.remark,f.hz_xm, f.cure_count, f.cured_count, m.name machineName
         from radiotherapy r
             left join flsqd f on r.fld_id = f.id
             left join machine m on r.machine_id = m.id
@@ -137,6 +137,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="z != null">z = #{z},</if>
             <if test="rotation != null">rotation = #{rotation},</if>
             <if test="cureIndex != null">cure_index = #{cureIndex},</if>
+            <if test="remark != null">remark = #{remark},</if>
         </trim>
         where id = #{id}
     </update>

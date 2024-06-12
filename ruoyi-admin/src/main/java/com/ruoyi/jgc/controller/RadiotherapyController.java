@@ -325,9 +325,9 @@ public class RadiotherapyController extends BaseController
         r.setRemark((String)map.get("remark"));
         r.setCureOperator((String)map.get("operatorNames"));
         r.setCureIndex((int)curedCount + 1);//治疗序号
-        r.setX(Double.valueOf(map.get("X").toString()));
-        r.setY(Double.valueOf(map.get("Y").toString()));
-        r.setZ(Double.valueOf(map.get("Z").toString()));
+        r.setX(Double.valueOf(map.get("x").toString()));
+        r.setY(Double.valueOf(map.get("y").toString()));
+        r.setZ(Double.valueOf(map.get("z").toString()));
         r.setRotation(Double.valueOf(map.get("rotation").toString()));
         radiotherapyService.updateRadiotherapy(r);
 
@@ -335,7 +335,7 @@ public class RadiotherapyController extends BaseController
         if (!CollectionUtils.isEmpty(opertaor)) {
             for (Integer i : opertaor) {
                 Fllcjl jl = new Fllcjl();
-                jl.setLcjdmc("fzsl");
+                jl.setLcjdmc("fszl");
                 jl.setFlid(fldId);
                 jl.setCzsj(r.getCureEndTime());
                 jl.setCzr(Long.valueOf(i));
