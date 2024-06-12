@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.jgc.mapper.OrgandamageMapper">
+    
+    <resultMap type="Organdamage" id="OrgandamageResult">
+        <result property="id"    column="id"    />
+        <result property="fldid"    column="fldId"    />
+        <result property="organ"    column="organ"    />
+        <result property="doselimit"    column="doseLimit"    />
+    </resultMap>
+
+    <sql id="selectOrgandamageVo">
+        select id, fldId, organ, doseLimit from organdamage
+    </sql>
+
+    <select id="selectOrgandamageList" parameterType="Organdamage" resultMap="OrgandamageResult">
+        <include refid="selectOrgandamageVo"/>
+        <where>  
+            <if test="fldid != null  and fldid != ''"> and fldId = #{fldid}</if>
+            <if test="organ != null  and organ != ''"> and organ = #{organ}</if>
+            <if test="doselimit != null "> and doseLimit = #{doselimit}</if>
+        </where>
+    </select>
+    
+    <select id="selectOrgandamageById" parameterType="Long" resultMap="OrgandamageResult">
+        <include refid="selectOrgandamageVo"/>
+        where id = #{id}
+    </select>
+        
+    <insert id="insertOrgandamage" parameterType="Organdamage">
+        insert into organdamage
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">id,</if>
+            <if test="fldid != null and fldid != ''">fldId,</if>
+            <if test="organ != null and organ != ''">organ,</if>
+            <if test="doselimit != null">doseLimit,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">#{id},</if>
+            <if test="fldid != null and fldid != ''">#{fldid},</if>
+            <if test="organ != null and organ != ''">#{organ},</if>
+            <if test="doselimit != null">#{doselimit},</if>
+         </trim>
+    </insert>
+
+    <update id="updateOrgandamage" parameterType="Organdamage">
+        update organdamage
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="fldid != null and fldid != ''">fldId = #{fldid},</if>
+            <if test="organ != null and organ != ''">organ = #{organ},</if>
+            <if test="doselimit != null">doseLimit = #{doselimit},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteOrgandamageById" parameterType="Long">
+        delete from organdamage where id = #{id}
+    </delete>
+
+    <delete id="deleteOrgandamageByIds" parameterType="String">
+        delete from organdamage where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

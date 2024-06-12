@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.jgc.mapper.TargetregionMapper">
+    
+    <resultMap type="Targetregion" id="TargetregionResult">
+        <result property="id"    column="id"    />
+        <result property="fldid"    column="fldId"    />
+        <result property="region"    column="region"    />
+        <result property="dose"    column="dose"    />
+        <result property="count"    column="count"    />
+    </resultMap>
+
+    <sql id="selectTargetregionVo">
+        select id, fldId, region, dose, count from targetregion
+    </sql>
+
+    <select id="selectTargetregionList" parameterType="Targetregion" resultMap="TargetregionResult">
+        <include refid="selectTargetregionVo"/>
+        <where>  
+            <if test="fldid != null  and fldid != ''"> and fldId = #{fldid}</if>
+            <if test="region != null  and region != ''"> and region = #{region}</if>
+            <if test="dose != null "> and dose = #{dose}</if>
+            <if test="count != null "> and count = #{count}</if>
+        </where>
+    </select>
+    
+    <select id="selectTargetregionById" parameterType="Long" resultMap="TargetregionResult">
+        <include refid="selectTargetregionVo"/>
+        where id = #{id}
+    </select>
+        
+    <insert id="insertTargetregion" parameterType="Targetregion">
+        insert into targetregion
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">id,</if>
+            <if test="fldid != null and fldid != ''">fldId,</if>
+            <if test="region != null and region != ''">region,</if>
+            <if test="dose != null">dose,</if>
+            <if test="count != null">count,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">#{id},</if>
+            <if test="fldid != null and fldid != ''">#{fldid},</if>
+            <if test="region != null and region != ''">#{region},</if>
+            <if test="dose != null">#{dose},</if>
+            <if test="count != null">#{count},</if>
+         </trim>
+    </insert>
+
+    <update id="updateTargetregion" parameterType="Targetregion">
+        update targetregion
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="fldid != null and fldid != ''">fldId = #{fldid},</if>
+            <if test="region != null and region != ''">region = #{region},</if>
+            <if test="dose != null">dose = #{dose},</if>
+            <if test="count != null">count = #{count},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteTargetregionById" parameterType="Long">
+        delete from targetregion where id = #{id}
+    </delete>
+
+    <delete id="deleteTargetregionByIds" parameterType="String">
+        delete from targetregion where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>
