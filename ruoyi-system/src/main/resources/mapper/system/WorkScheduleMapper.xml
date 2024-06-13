@@ -15,11 +15,13 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="textInput"    column="text_input"    />
         <result property="tb"    column="tb"    />
         <result property="userName"    column="user_name"    />
+        <result property="dbrName"    column="dbrName"    />
     </resultMap>
 
     <sql id="selectWorkScheduleVo">
-        select w.id, w.user_id, sch_date, sch_time, machine_id, dbr, dbsj, text_input, tb, u.user_name from work_schedule w
-        left join sys_user u on u.user_id = w.user_id
+        select w.id, w.user_id, sch_date, sch_time, machine_id, dbr, u2.user_name as dbrName, dbsj, text_input, tb, u1.user_name from work_schedule w
+        left join sys_user u1 on w.user_id = u1.user_id
+        left join sys_user u2 on w.dbr = u2.user_id
     </sql>
 
     <select id="selectWorkScheduleList" parameterType="WorkSchedule" resultMap="WorkScheduleResult">

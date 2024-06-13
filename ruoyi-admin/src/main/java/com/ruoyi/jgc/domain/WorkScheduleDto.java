@@ -8,6 +8,7 @@ package com.ruoyi.jgc.domain;
  */
 public class WorkScheduleDto extends WorkSchedule{
     private String userName;
+    private String dbrName;
 
     public String getUserName() {
         return userName;
@@ -15,5 +16,13 @@ public class WorkScheduleDto extends WorkSchedule{
 
     public void setUserName(String userName) {
         this.userName = userName;
+    }
+
+    public String getDbrName() {
+        return dbrName;
+    }
+
+    public void setDbrName(String dbrName) {
+        this.dbrName = dbrName;
     }
 }
